@@ -1,2 +1,4 @@
 adapters/audio_adapter.py
 adapters/audio_adapter.py
+scripts/evaluate_label_aware_parent_aggregation.py
+docs/LABEL_AWARE_PARENT_AGGREGATION_COMMAND.md
