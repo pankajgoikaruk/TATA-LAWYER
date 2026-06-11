@@ -1,77 +1,39 @@
-﻿# Python
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .venv/
 venv/
-.env
+env/
+.ipynb_checkpoints/
+
+# Data / audio / generated artifacts
+human_talk_workspace/
+human_talk_dataset/
+human_talk_tata_seed_dataset/
+human_talk_triage_seed_dataset_excluded/
+*.wav
+*.mp3
+*.flac
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.zip
+*.tar
+*.gz
+
+# Model outputs
+main_models/runs/
+main_models/packages/
+feature_cache/
+raw_pseudo_pool_feature_cache/
+final_holdout_feature_cache/
 
 # OS / IDE
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
-
-# Data / caches / runs (do not commit)
-data_cache*/
-data_caches*/
-data_cache_v*/
-runs*/
-analysis/plots/
-analysis/*.png
-
-# Multi-label generated data/caches/results
-multilabel_data/
-multilabel_cache/
-runs_multilabel/
-
-# Model artifacts
-**/ckpt/
-*.pt
-*.pth
-*.onnx
-*.npz
-*.npy
-
-# Logs
-*.log
-
-# macOS resource fork junk
-._*
-
-# optional: keep raw datasets out of git (recommended for bigger data)
-data/moth_sounds/
-
-data2/
-data3/
-data_1_sec/
-old run 12-04-26/
-old run 12-04-26/analysis/
-
-data/
-data2/
-data_cache/
-data_caches/
-runs/
-analysis/
-*.npy
-*.wav
-*.pt
-*.pth
-__pycache__/
-
-# Local datasets / prepared datasets - do not commit
-new_data/
-prepared_data2/
-
-event_dataset/
-human_talk_dataset/
-final_dataset/
-runs_multilabel_backup/
-
-# Human-talk local dataset/workspace
-human_talk_dataset/
-human_talk_workspace/
-
-human_talk_triage_seed_dataset/
