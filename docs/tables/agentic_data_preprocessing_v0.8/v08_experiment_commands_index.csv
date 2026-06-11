@@ -1,0 +1,167 @@
+stage,purpose,command,key_output
+1_prepare_delta_review,Prepare delta-only manual review queues from v0.6 trusted base and v0.8 LAWYER outputs.,"$V06Root = ""human_talk_workspace\tata_v0.6_raw_pipeline""
+$V08Root = ""human_talk_workspace\tata_v0.8_raw_pipeline""
+$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+
+python scripts\prepare_v08_delta_from_v06_trusted_base.py `
+  --v06_root ""$V06Root"" `
+  --v08_root ""$V08Root"" `
+  --out_root ""$HCBBRoot"" `
+  --labels_json ""configs\human_talk_10label_schema.json"" `
+  --lawyer_config ""configs\lawyer_v08_human_talk.json""",Generated 03/04/05/06/07 review queues; 291 LAWYER-new rows selected for review.
+2_apply_reviewed_delta,"Apply completed human review for non-target context labels, corrected holdout labels, and reviewed LAWYER new samples.","$V06Root = ""human_talk_workspace\tata_v0.6_raw_pipeline""
+$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+
+python scripts\apply_v08_reviewed_delta_outputs.py `
+  --v06_root ""$V06Root"" `
+  --out_root ""$HCBBRoot"" `
+  --labels_json ""configs\human_talk_10label_schema.json""","Corrected raw needs-review=3,171; corrected holdout=867; reviewed LAWYER-new=291; warning+new=1,216."
+3_fix_known_nontarget_identity,Ensure known non-target speaker folders have all target-speaker labels forced to 0 and other_speaker_present forced to 1.,"$V06Root = ""human_talk_workspace\tata_v0.6_raw_pipeline""
+$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+
+python scripts\fix_v08_known_nontarget_identity_before_manifest.py `
+  --v06_root ""$V06Root"" `
+  --out_root ""$HCBBRoot"" `
+  --labels_json ""configs\human_talk_10label_schema.json"" `
+  --lawyer_config ""configs\lawyer_v08_human_talk.json""",Fixed historical warning rows where 167 known non-target rows still had target labels active.
+4_build_manifest,Build the v0.8-HCB final expanded training manifest from v0.6 trusted base plus corrected/reviewed v0.8 additions.,"$ScratchRoot = ""human_talk_workspace\tata_v0.6_scratch""
+$V06Root = ""human_talk_workspace\tata_v0.6_raw_pipeline""
+$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+
+python scripts\build_tata_v06_final_expanded_training_manifest.py `
+  --seed_feature_manifest ""$ScratchRoot\feature_cache\metadata\multilabel_features_manifest.csv"" `
+  --seed_features_root ""$ScratchRoot\feature_cache\features"" `
+  --raw_feature_manifest ""$V06Root\raw_pseudo_pool_feature_cache\metadata\multilabel_features_manifest.csv"" `
+  --raw_features_root ""$V06Root\raw_pseudo_pool_feature_cache\features"" `
+  --hybrid_accepted_csv ""$HCBBRoot\corrected_training_inputs\hybrid_accepted_v08_nontarget_identity_fixed.csv"" `
+  --hybrid_warning_csv ""$HCBBRoot\corrected_training_inputs\hybrid_accepted_with_warning_PLUS_REVIEWED_LAWYER_NEW_v08_nontarget_identity_fixed.csv"" `
+  --corrected_needs_review_csv ""$HCBBRoot\corrected_training_inputs\02_raw_hybrid_needs_review_MANUAL_CORRECTION_FINAL_v08_context_checked.csv"" `
+  --labels_json ""configs\human_talk_10label_schema.json"" `
+  --out_root ""$HCBBRoot\final_expanded_training_dataset""","Final combined rows=36,249; raw parent labels used=4,756; zero-active excluded=0; missing parent groups=0."
+5_balance_manifest,"Down-sample background-heavy rows while preserving all target-speaker, audience, silence, and clean seed rows.","$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+
+python scripts\create_v08_balanced_training_manifest.py `
+  --input_manifest ""$HCBBRoot\final_expanded_training_dataset\metadata\multilabel_features_manifest.csv"" `
+  --out_root ""$HCBBRoot\final_expanded_training_dataset_balanced"" `
+  --labels_json ""configs\human_talk_10label_schema.json"" `
+  --lawyer_config ""configs\lawyer_v08_human_talk.json"" `
+  --other_cap_multiplier 3.0 `
+  --seed 42","Rows reduced 36,249 -> 29,363; train rows 32,405 -> 25,519; val/test unchanged."
+6_train_main_model,Train the final v0.8-HCB 3-exit model using the balanced manifest.,"$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+$TrainManifest = ""$HCBBRoot\final_expanded_training_dataset_balanced\metadata\multilabel_features_manifest_balanced.csv""
+
+powershell -ExecutionPolicy Bypass -File scripts\run_tata_weakclip_experiment.ps1 `
+  -Manifest ""$TrainManifest"" `
+  -FeaturesRoot ""."" `
+  -LabelsJson ""configs\human_talk_10label_schema.json"" `
+  -WorkspaceRoot ""$HCBBRoot"" `
+  -RunsRoot ""$HCBBRoot\main_models\runs"" `
+  -PackagesRoot ""$HCBBRoot\main_models\packages"" `
+  -LogsRoot ""$HCBBRoot\main_models\logs"" `
+  -Variant ""main_v08_human_corrected_balanced_3exit"" `
+  -TapBlocks ""1,3"" `
+  -Epochs 40 `
+  -BatchSize 64 `
+  -LR 0.001 `
+  -Threshold 0.5 `
+  -Device cpu",Best epoch=39; best validation final-exit Macro-F1=0.8105; internal test Exit-3 Macro-F1=0.8305.
+7_refresh_corrected_holdout_manifest,Copy existing holdout feature manifest and replace its label columns from corrected parent-level holdout ground truth.,"$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+$OldHoldoutManifest = ""human_talk_workspace\tata_v0.6_raw_pipeline\final_holdout_feature_cache\metadata\multilabel_features_manifest.csv""
+$CorrectedHoldoutCsv = ""$HCBBRoot\corrected_holdout\01_raw_final_holdout_GROUND_TRUTH_FINAL_v08_context_checked.csv""
+$CorrectedHoldoutManifest = ""$HCBBRoot\corrected_holdout\multilabel_features_manifest_CORRECTED_LABELS.csv""
+
+$env:OLD_HOLDOUT_MANIFEST = $OldHoldoutManifest
+$env:CORRECTED_HOLDOUT_CSV = $CorrectedHoldoutCsv
+$env:CORRECTED_HOLDOUT_MANIFEST = $CorrectedHoldoutManifest
+
+@'
+import os
+import pandas as pd
+from pathlib import Path
+labels = [""Brene_Brown"",""Eckhart_Tolle"",""Eric_Thomas"",""Gary_Vee"",""Jay_Shetty"",""Nick_Vujicic"",""other_speaker_present"",""music_present"",""audience_reaction_present"",""silence_present""]
+seg = pd.read_csv(Path(os.environ[""OLD_HOLDOUT_MANIFEST""]), low_memory=False)
+parent = pd.read_csv(Path(os.environ[""CORRECTED_HOLDOUT_CSV""]), low_memory=False)
+seg[""parent_clip_id""] = seg[""parent_clip_id""].astype(str)
+parent[""parent_clip_id""] = parent[""parent_clip_id""].astype(str)
+parent = parent.drop_duplicates(""parent_clip_id"", keep=""last"").set_index(""parent_clip_id"")
+missing = sorted(set(seg[""parent_clip_id""]) - set(parent.index))
+if missing:
+    raise RuntimeError(f""Missing corrected parent labels for {len(missing)} segment parent ids. Example: {missing[:5]}"")
+for lab in labels:
+    seg[lab] = seg[""parent_clip_id""].map(parent[lab]).astype(int)
+seg[""labels""] = seg.apply(lambda r: ""|"".join([lab for lab in labels if int(r[lab]) == 1]), axis=1)
+seg[""manual_labels""] = seg[""labels""]
+seg[""num_active_labels""] = seg[labels].sum(axis=1).astype(int)
+out = Path(os.environ[""CORRECTED_HOLDOUT_MANIFEST""])
+out.parent.mkdir(parents=True, exist_ok=True)
+seg.to_csv(out, index=False)
+print(out, len(seg), seg[""parent_clip_id""].nunique())
+'@ | python -","Corrected holdout feature manifest: 4,335 segments / 867 parent clips."
+8_eval_v08_fixed_parent_mean,Evaluate final v0.8-HCB model on corrected holdout using parent/clip-level mean aggregation and fixed threshold 0.5.,"$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+$RunDir = ""$HCBBRoot\main_models\runs\main_v08_human_corrected_balanced_3exit_20260610_084027""
+$CorrectedHoldoutManifest = ""$HCBBRoot\corrected_holdout\multilabel_features_manifest_CORRECTED_LABELS.csv""
+$HoldoutFeaturesRoot = ""human_talk_workspace\tata_v0.6_raw_pipeline\final_holdout_feature_cache\features""
+$OutDir = ""$HCBBRoot\evaluation\existing_script_parent_mean_fixed""
+
+python scripts\evaluate_tata_final_holdout_parent_level.py `
+  --run_dir ""$RunDir"" `
+  --holdout_manifest ""$CorrectedHoldoutManifest"" `
+  --features_root ""$HoldoutFeaturesRoot"" `
+  --out_dir ""$OutDir"" `
+  --threshold_mode fixed_0p5 `
+  --aggregation mean `
+  --device cpu `
+  --batch_size 128","Exit-3 corrected holdout: Macro-F1=0.7801, Micro-F1=0.9332, Samples-F1=0.9406, Exact=0.8397, Hamming=0.0194."
+9_tune_thresholds,Tune per-label/per-exit thresholds on the internal validation split for ablation.,"$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+$RunDir = ""$HCBBRoot\main_models\runs\main_v08_human_corrected_balanced_3exit_20260610_084027""
+
+python scripts\tune_multilabel_thresholds.py `
+  --run_dir ""$RunDir"" `
+  --device cpu `
+  --batch_size 128 `
+  --objective f1","Internal test Exit-3 tuned Macro-F1=0.8352, but corrected-holdout parent mean worsened vs fixed 0.5."
+10_eval_v08_tuned_parent_mean,Evaluate tuned thresholds on corrected holdout parent-level mean as ablation.,"$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+$RunDir = ""$HCBBRoot\main_models\runs\main_v08_human_corrected_balanced_3exit_20260610_084027""
+$CorrectedHoldoutManifest = ""$HCBBRoot\corrected_holdout\multilabel_features_manifest_CORRECTED_LABELS.csv""
+$HoldoutFeaturesRoot = ""human_talk_workspace\tata_v0.6_raw_pipeline\final_holdout_feature_cache\features""
+$OutDir = ""$HCBBRoot\evaluation\existing_script_parent_mean_tuned""
+
+python scripts\evaluate_tata_final_holdout_parent_level.py `
+  --run_dir ""$RunDir"" `
+  --holdout_manifest ""$CorrectedHoldoutManifest"" `
+  --features_root ""$HoldoutFeaturesRoot"" `
+  --out_dir ""$OutDir"" `
+  --threshold_mode tuned_per_exit `
+  --aggregation mean `
+  --device cpu `
+  --batch_size 128","Exit-3 tuned corrected holdout: Macro-F1=0.7487, Micro-F1=0.9139, Samples-F1=0.9210, Hamming=0.0243."
+11_eval_v06_3exit_corrected_holdout,Fairly re-evaluate old v0.6 3-exit model on the same corrected holdout labels.,"$V06RunDir = ""human_talk_workspace\tata_v0.6_raw_pipeline\main_models\runs\main_v06_expanded_3exit_20260603_194435""
+$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+$CorrectedHoldoutManifest = ""$HCBBRoot\corrected_holdout\multilabel_features_manifest_CORRECTED_LABELS.csv""
+$HoldoutFeaturesRoot = ""human_talk_workspace\tata_v0.6_raw_pipeline\final_holdout_feature_cache\features""
+$OutDir = ""$HCBBRoot\evaluation\v06_3exit_on_corrected_holdout_parent_mean_fixed""
+
+python scripts\evaluate_tata_final_holdout_parent_level.py `
+  --run_dir ""$V06RunDir"" `
+  --holdout_manifest ""$CorrectedHoldoutManifest"" `
+  --features_root ""$HoldoutFeaturesRoot"" `
+  --out_dir ""$OutDir"" `
+  --threshold_mode fixed_0p5 `
+  --aggregation mean `
+  --device cpu `
+  --batch_size 128","v0.6 3-exit Exit-3 corrected holdout: Macro-F1=0.7537, Micro-F1=0.8865, Samples-F1=0.8992, Hamming=0.0315."
+12_eval_v06_5exit_corrected_holdout,Fairly re-evaluate old v0.6 5-exit model on the same corrected holdout labels.,"$V06RunDir = ""human_talk_workspace\tata_v0.6_raw_pipeline\main_models\runs\main_v06_expanded_5exit_20260603_210324""
+$HCBBRoot = ""human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline""
+$CorrectedHoldoutManifest = ""$HCBBRoot\corrected_holdout\multilabel_features_manifest_CORRECTED_LABELS.csv""
+$HoldoutFeaturesRoot = ""human_talk_workspace\tata_v0.6_raw_pipeline\final_holdout_feature_cache\features""
+$OutDir = ""$HCBBRoot\evaluation\v06_5exit_on_corrected_holdout_parent_mean_fixed""
+
+python scripts\evaluate_tata_final_holdout_parent_level.py `
+  --run_dir ""$V06RunDir"" `
+  --holdout_manifest ""$CorrectedHoldoutManifest"" `
+  --features_root ""$HoldoutFeaturesRoot"" `
+  --out_dir ""$OutDir"" `
+  --threshold_mode fixed_0p5 `
+  --aggregation mean `
+  --device cpu `
+  --batch_size 128","v0.6 5-exit Exit-5 corrected holdout: Macro-F1=0.7460, Micro-F1=0.8771, Samples-F1=0.8881, Hamming=0.0338."

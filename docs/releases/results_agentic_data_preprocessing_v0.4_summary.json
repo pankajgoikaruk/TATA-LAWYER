@@ -1,0 +1,602 @@
+{
+  "softmax": {
+    "softmax_3exit": {
+      "run": "raw5_agentic_cleaned_3exit_greedy_final_001",
+      "num_exits": 3,
+      "final_acc": 0.975990099009901,
+      "final_macro_f1": 0.9756406368180361,
+      "final_weighted_f1": 0.9759259513318762,
+      "policy_acc": 0.9683168316831683,
+      "avg_exit_depth": 2.0886138613861385,
+      "compute_saved_pct": 52.55534301437452,
+      "exit_consistency": 0.9913366336633663,
+      "flip_any_rate": 0.3579207920792079,
+      "exit_mix": {
+        "e1": 0.18712871287128713,
+        "e2": 0.5371287128712872,
+        "e3": 0.27574257425742577
+      },
+      "clip_full_acc": 0.9957173447537473,
+      "clip_full_windows": 8.650963597430406,
+      "clip_time_acc": 0.9892933618843683,
+      "clip_time_windows": 2.08779443254818,
+      "clip_total_windows": 8.650963597430406,
+      "clip_windows_saved_pct": 75.86633663366335,
+      "clip_compute_saved_pct": 75.82365489452478,
+      "per_label": {
+        "Brene_Brown": {
+          "precision": 0.9585561497326203,
+          "recall": 0.9689189189189189,
+          "f1-score": 0.9637096774193549,
+          "support": 740.0
+        },
+        "Eckhart_Tolle": {
+          "precision": 0.9861271676300578,
+          "recall": 0.9988290398126464,
+          "f1-score": 0.9924374636416521,
+          "support": 854.0
+        },
+        "Eric_Thomas": {
+          "precision": 0.9807445442875481,
+          "recall": 0.9538077403245943,
+          "f1-score": 0.9670886075949368,
+          "support": 801.0
+        },
+        "Gary_Vee": {
+          "precision": 0.9799291617473436,
+          "recall": 0.9617612977983777,
+          "f1-score": 0.9707602339181286,
+          "support": 863.0
+        },
+        "Jay_Shetty": {
+          "precision": 0.9725343320848939,
+          "recall": 0.9961636828644501,
+          "f1-score": 0.9842072015161086,
+          "support": 782.0
+        }
+      },
+      "exits": [
+        {
+          "exit": 1,
+          "acc": 0.6561881188118812,
+          "macro_f1": 0.6404300668370149,
+          "weighted_f1": 0.6435781753319915
+        },
+        {
+          "exit": 2,
+          "acc": 0.924009900990099,
+          "macro_f1": 0.9229136657661495,
+          "weighted_f1": 0.9236913170299554
+        },
+        {
+          "exit": 3,
+          "acc": 0.975990099009901,
+          "macro_f1": 0.9756406368180361,
+          "weighted_f1": 0.9759259513318762
+        }
+      ]
+    },
+    "softmax_5exit": {
+      "run": "raw5_agentic_cleaned_5exit_greedy_final_001",
+      "num_exits": 5,
+      "final_acc": 0.9616336633663366,
+      "final_macro_f1": 0.9609860252057599,
+      "final_weighted_f1": 0.9614883922885825,
+      "policy_acc": 0.9519801980198019,
+      "avg_exit_depth": 2.7143564356435643,
+      "compute_saved_pct": 62.030370478736096,
+      "exit_consistency": 0.9849009900990099,
+      "flip_any_rate": 0.3839108910891089,
+      "exit_mix": {
+        "e1": 0.13762376237623763,
+        "e2": 0.38663366336633664,
+        "e3": 0.22722772277227724,
+        "e4": 0.12079207920792079,
+        "e5": 0.12772277227722773
+      },
+      "clip_full_acc": 0.9850107066381156,
+      "clip_full_windows": 8.650963597430406,
+      "clip_time_acc": 0.9764453961456103,
+      "clip_time_windows": 2.164882226980728,
+      "clip_total_windows": 8.650963597430406,
+      "clip_windows_saved_pct": 74.97524752475248,
+      "clip_compute_saved_pct": 74.63979573226337,
+      "per_label": {
+        "Brene_Brown": {
+          "precision": 0.9633286318758815,
+          "recall": 0.922972972972973,
+          "f1-score": 0.9427191166321601,
+          "support": 740.0
+        },
+        "Eckhart_Tolle": {
+          "precision": 0.9895104895104895,
+          "recall": 0.9941451990632318,
+          "f1-score": 0.991822429906542,
+          "support": 854.0
+        },
+        "Eric_Thomas": {
+          "precision": 0.9502487562189055,
+          "recall": 0.9538077403245943,
+          "f1-score": 0.9520249221183801,
+          "support": 801.0
+        },
+        "Gary_Vee": {
+          "precision": 0.9642857142857143,
+          "recall": 0.9385863267670915,
+          "f1-score": 0.9512624779800353,
+          "support": 863.0
+        },
+        "Jay_Shetty": {
+          "precision": 0.9396863691194209,
+          "recall": 0.9961636828644501,
+          "f1-score": 0.9671011793916822,
+          "support": 782.0
+        }
+      },
+      "exits": [
+        {
+          "exit": 1,
+          "acc": 0.6502475247524753,
+          "macro_f1": 0.6333711632740131,
+          "weighted_f1": 0.6366623439563696
+        },
+        {
+          "exit": 2,
+          "acc": 0.8641089108910891,
+          "macro_f1": 0.8612327858550053,
+          "weighted_f1": 0.862222814454518
+        },
+        {
+          "exit": 3,
+          "acc": 0.9202970297029703,
+          "macro_f1": 0.9188943980246839,
+          "weighted_f1": 0.9195494106659354
+        },
+        {
+          "exit": 4,
+          "acc": 0.9544554455445544,
+          "macro_f1": 0.9536504438962605,
+          "weighted_f1": 0.9542418603471136
+        },
+        {
+          "exit": 5,
+          "acc": 0.9616336633663366,
+          "macro_f1": 0.9609860252057599,
+          "weighted_f1": 0.9614883922885825
+        }
+      ]
+    }
+  },
+  "sigmoid": {
+    "sigmoid_3exit": {
+      "run": "agentic_cleaned_sigmoid_ablation_3exit_20260523_194423",
+      "num_exits": 3,
+      "fixed": {
+        "exit": 3,
+        "micro_f1": 0.9695689976400447,
+        "macro_f1": 0.9691586154276554,
+        "samples_f1": 0.9618811881188118,
+        "micro_precision": 0.9730740463724757,
+        "micro_recall": 0.9660891089108911,
+        "macro_precision": 0.9727807341677179,
+        "macro_recall": 0.9657737508541814,
+        "exact_match": 0.9534653465346534,
+        "hamming_loss": 0.012128712871287129,
+        "avg_pred_labels": 0.9928217821782178,
+        "avg_true_labels": 1.0
+      },
+      "tuned": {
+        "thresholds": {
+          "Brene_Brown": 0.5199999809265137,
+          "Eckhart_Tolle": 0.3499999940395355,
+          "Eric_Thomas": 0.4099999964237213,
+          "Gary_Vee": 0.4300000071525574,
+          "Jay_Shetty": 0.28999999165534973
+        },
+        "micro_f1": 0.9673671199011125,
+        "macro_f1": 0.9670051533309229,
+        "samples_f1": 0.9625412541254125,
+        "micro_precision": 0.9661728395061728,
+        "micro_recall": 0.9685643564356435,
+        "macro_precision": 0.9661236448170947,
+        "macro_recall": 0.9682553954797617,
+        "exact_match": 0.9504950495049505,
+        "hamming_loss": 0.013069306930693069,
+        "avg_true_labels": 1.0,
+        "avg_pred_labels": 1.0024752475247525,
+        "per_label": {
+          "Brene_Brown": {
+            "threshold": 0.5199999809265137,
+            "precision": 0.9707112970711297,
+            "recall": 0.9405405405405406,
+            "f1": 0.9553877831159918,
+            "support": 740,
+            "predicted_positive": 717
+          },
+          "Eckhart_Tolle": {
+            "threshold": 0.3499999940395355,
+            "precision": 0.9860950173812283,
+            "recall": 0.9964871194379391,
+            "f1": 0.9912638322655795,
+            "support": 854,
+            "predicted_positive": 863
+          },
+          "Eric_Thomas": {
+            "threshold": 0.4099999964237213,
+            "precision": 0.9311594202898551,
+            "recall": 0.9625468164794008,
+            "f1": 0.9465930018416207,
+            "support": 801,
+            "predicted_positive": 828
+          },
+          "Gary_Vee": {
+            "threshold": 0.4300000071525574,
+            "precision": 0.9737470167064439,
+            "recall": 0.9455388180764774,
+            "f1": 0.9594356261022927,
+            "support": 863,
+            "predicted_positive": 838
+          },
+          "Jay_Shetty": {
+            "threshold": 0.28999999165534973,
+            "precision": 0.9689054726368159,
+            "recall": 0.9961636828644501,
+            "f1": 0.9823455233291298,
+            "support": 782,
+            "predicted_positive": 804
+          }
+        }
+      },
+      "thresholds": {
+        "Brene_Brown": 0.5199999809265137,
+        "Eckhart_Tolle": 0.3499999940395355,
+        "Eric_Thomas": 0.4099999964237213,
+        "Gary_Vee": 0.4300000071525574,
+        "Jay_Shetty": 0.28999999165534973
+      },
+      "per_fixed": {
+        "Brene_Brown": {
+          "precision": 0.9693593314763231,
+          "recall": 0.9405405405405406,
+          "f1": 0.9547325102880658,
+          "support": 740,
+          "predicted_positive": 718
+        },
+        "Eckhart_Tolle": {
+          "precision": 0.9906759906759907,
+          "recall": 0.9953161592505855,
+          "f1": 0.9929906542056075,
+          "support": 854,
+          "predicted_positive": 858
+        },
+        "Eric_Thomas": {
+          "precision": 0.945679012345679,
+          "recall": 0.9563046192259675,
+          "f1": 0.9509621353196772,
+          "support": 801,
+          "predicted_positive": 810
+        },
+        "Gary_Vee": {
+          "precision": 0.978391356542617,
+          "recall": 0.944380069524913,
+          "f1": 0.9610849056603774,
+          "support": 863,
+          "predicted_positive": 833
+        },
+        "Jay_Shetty": {
+          "precision": 0.9797979797979798,
+          "recall": 0.9923273657289002,
+          "f1": 0.9860228716645489,
+          "support": 782,
+          "predicted_positive": 792
+        }
+      },
+      "per_tuned": {
+        "Brene_Brown": {
+          "threshold": 0.5199999809265137,
+          "precision": 0.9707112970711297,
+          "recall": 0.9405405405405406,
+          "f1": 0.9553877831159918,
+          "support": 740,
+          "predicted_positive": 717
+        },
+        "Eckhart_Tolle": {
+          "threshold": 0.3499999940395355,
+          "precision": 0.9860950173812283,
+          "recall": 0.9964871194379391,
+          "f1": 0.9912638322655795,
+          "support": 854,
+          "predicted_positive": 863
+        },
+        "Eric_Thomas": {
+          "threshold": 0.4099999964237213,
+          "precision": 0.9311594202898551,
+          "recall": 0.9625468164794008,
+          "f1": 0.9465930018416207,
+          "support": 801,
+          "predicted_positive": 828
+        },
+        "Gary_Vee": {
+          "threshold": 0.4300000071525574,
+          "precision": 0.9737470167064439,
+          "recall": 0.9455388180764774,
+          "f1": 0.9594356261022927,
+          "support": 863,
+          "predicted_positive": 838
+        },
+        "Jay_Shetty": {
+          "threshold": 0.28999999165534973,
+          "precision": 0.9689054726368159,
+          "recall": 0.9961636828644501,
+          "f1": 0.9823455233291298,
+          "support": 782,
+          "predicted_positive": 804
+        }
+      },
+      "dynamic": {
+        "model": "agentic_cleaned_sigmoid_ablation_3exit",
+        "run_dir": "C:\\Users\\wwwsa\\PycharmProjects\\NeuroAccuExit-ASHADIP\\human_talk_workspace\\sigmoid_ablation\\runs\\agentic_cleaned_sigmoid_ablation_3exit_20260523_194423",
+        "split": "test",
+        "policy": "label_set_stability",
+        "threshold_mode": "tuned_per_exit",
+        "min_exit": 2,
+        "stable_k": 2,
+        "allow_empty_stop": false,
+        "n_samples": 4040,
+        "num_exits": 3,
+        "avg_exit_depth": 3.0,
+        "final_exit_depth": 3,
+        "policy_depth_units": 12120.0,
+        "full_depth_units": 12120.0,
+        "depth_compute_saved_pct": 0.0,
+        "exit_consistency": 1.0,
+        "label_set_flip_any_rate": 0.6705,
+        "avg_label_set_flip_count": 0.778,
+        "avg_label_bit_flip_count": 1.1416,
+        "macro_f1": 0.967,
+        "micro_f1": 0.9674,
+        "samples_f1": 0.9625,
+        "exact_match": 0.9505,
+        "hamming_loss": 0.0131,
+        "hamming_accuracy": 0.9869,
+        "jaccard_score": 0.9595,
+        "micro_precision": 0.9662,
+        "micro_recall": 0.9686,
+        "macro_precision": 0.9661,
+        "macro_recall": 0.9683,
+        "avg_true_labels": 1.0,
+        "avg_pred_labels": 1.0025,
+        "label_cardinality_error": 0.0347,
+        "label_cardinality_bias": 0.0025,
+        "macro_auprc": 0.9938,
+        "micro_auprc": 0.995,
+        "mAP": 0.9938,
+        "exit1_samples": 0,
+        "exit1_fraction": 0.0,
+        "exit2_samples": 0,
+        "exit2_fraction": 0.0,
+        "exit3_samples": 4040,
+        "exit3_fraction": 1.0
+      },
+      "best_epoch": 26,
+      "best_val_macro_f1": 0.9783766562938203
+    },
+    "sigmoid_5exit": {
+      "run": "agentic_cleaned_sigmoid_ablation_5exit_20260523_202702",
+      "num_exits": 5,
+      "fixed": {
+        "exit": 5,
+        "micro_f1": 0.9631000863877576,
+        "macro_f1": 0.9626758509111056,
+        "samples_f1": 0.958085808580858,
+        "micro_precision": 0.9603741078021166,
+        "micro_recall": 0.9658415841584158,
+        "macro_precision": 0.9601998078645234,
+        "macro_recall": 0.9658522750349541,
+        "exact_match": 0.9425742574257425,
+        "hamming_loss": 0.014801980198019801,
+        "avg_pred_labels": 1.0056930693069306,
+        "avg_true_labels": 1.0
+      },
+      "tuned": {
+        "thresholds": {
+          "Brene_Brown": 0.8700000047683716,
+          "Eckhart_Tolle": 0.30000001192092896,
+          "Eric_Thomas": 0.550000011920929,
+          "Gary_Vee": 0.1899999976158142,
+          "Jay_Shetty": 0.3100000023841858
+        },
+        "micro_f1": 0.9651926173665304,
+        "macro_f1": 0.9647274450786647,
+        "samples_f1": 0.9584158415841584,
+        "micro_precision": 0.9660302504339202,
+        "micro_recall": 0.9643564356435643,
+        "macro_precision": 0.9661310240016773,
+        "macro_recall": 0.9634724947927621,
+        "exact_match": 0.9465346534653465,
+        "hamming_loss": 0.013910891089108911,
+        "avg_true_labels": 1.0,
+        "avg_pred_labels": 0.9982673267326733,
+        "per_label": {
+          "Brene_Brown": {
+            "threshold": 0.8700000047683716,
+            "precision": 0.9540389972144847,
+            "recall": 0.9256756756756757,
+            "f1": 0.9396433470507545,
+            "support": 740,
+            "predicted_positive": 718
+          },
+          "Eckhart_Tolle": {
+            "threshold": 0.30000001192092896,
+            "precision": 0.9872389791183295,
+            "recall": 0.9964871194379391,
+            "f1": 0.9918414918414918,
+            "support": 854,
+            "predicted_positive": 862
+          },
+          "Eric_Thomas": {
+            "threshold": 0.550000011920929,
+            "precision": 0.9524405506883604,
+            "recall": 0.9500624219725343,
+            "f1": 0.95125,
+            "support": 801,
+            "predicted_positive": 799
+          },
+          "Gary_Vee": {
+            "threshold": 0.1899999976158142,
+            "precision": 0.94211123723042,
+            "recall": 0.9617612977983777,
+            "f1": 0.9518348623853211,
+            "support": 863,
+            "predicted_positive": 881
+          },
+          "Jay_Shetty": {
+            "threshold": 0.3100000023841858,
+            "precision": 0.9948253557567918,
+            "recall": 0.9833759590792839,
+            "f1": 0.9890675241157556,
+            "support": 782,
+            "predicted_positive": 773
+          }
+        }
+      },
+      "thresholds": {
+        "Brene_Brown": 0.8700000047683716,
+        "Eckhart_Tolle": 0.30000001192092896,
+        "Eric_Thomas": 0.550000011920929,
+        "Gary_Vee": 0.1899999976158142,
+        "Jay_Shetty": 0.3100000023841858
+      },
+      "per_fixed": {
+        "Brene_Brown": {
+          "precision": 0.8923654568210263,
+          "recall": 0.9635135135135136,
+          "f1": 0.926575698505523,
+          "support": 740,
+          "predicted_positive": 799
+        },
+        "Eckhart_Tolle": {
+          "precision": 0.9895104895104895,
+          "recall": 0.9941451990632318,
+          "f1": 0.991822429906542,
+          "support": 854,
+          "predicted_positive": 858
+        },
+        "Eric_Thomas": {
+          "precision": 0.9516129032258065,
+          "recall": 0.9575530586766542,
+          "f1": 0.95457373988799,
+          "support": 801,
+          "predicted_positive": 806
+        },
+        "Gary_Vee": {
+          "precision": 0.970131421744325,
+          "recall": 0.9409038238702202,
+          "f1": 0.9552941176470588,
+          "support": 863,
+          "predicted_positive": 837
+        },
+        "Jay_Shetty": {
+          "precision": 0.9973787680209698,
+          "recall": 0.9731457800511509,
+          "f1": 0.9851132686084142,
+          "support": 782,
+          "predicted_positive": 763
+        }
+      },
+      "per_tuned": {
+        "Brene_Brown": {
+          "threshold": 0.8700000047683716,
+          "precision": 0.9540389972144847,
+          "recall": 0.9256756756756757,
+          "f1": 0.9396433470507545,
+          "support": 740,
+          "predicted_positive": 718
+        },
+        "Eckhart_Tolle": {
+          "threshold": 0.30000001192092896,
+          "precision": 0.9872389791183295,
+          "recall": 0.9964871194379391,
+          "f1": 0.9918414918414918,
+          "support": 854,
+          "predicted_positive": 862
+        },
+        "Eric_Thomas": {
+          "threshold": 0.550000011920929,
+          "precision": 0.9524405506883604,
+          "recall": 0.9500624219725343,
+          "f1": 0.95125,
+          "support": 801,
+          "predicted_positive": 799
+        },
+        "Gary_Vee": {
+          "threshold": 0.1899999976158142,
+          "precision": 0.94211123723042,
+          "recall": 0.9617612977983777,
+          "f1": 0.9518348623853211,
+          "support": 863,
+          "predicted_positive": 881
+        },
+        "Jay_Shetty": {
+          "threshold": 0.3100000023841858,
+          "precision": 0.9948253557567918,
+          "recall": 0.9833759590792839,
+          "f1": 0.9890675241157556,
+          "support": 782,
+          "predicted_positive": 773
+        }
+      },
+      "dynamic": {
+        "model": "agentic_cleaned_sigmoid_ablation_5exit",
+        "run_dir": "C:\\Users\\wwwsa\\PycharmProjects\\NeuroAccuExit-ASHADIP\\human_talk_workspace\\sigmoid_ablation\\runs\\agentic_cleaned_sigmoid_ablation_5exit_20260523_202702",
+        "split": "test",
+        "policy": "label_set_stability",
+        "threshold_mode": "tuned_per_exit",
+        "min_exit": 2,
+        "stable_k": 2,
+        "allow_empty_stop": false,
+        "n_samples": 4040,
+        "num_exits": 5,
+        "avg_exit_depth": 3.4537,
+        "final_exit_depth": 5,
+        "policy_depth_units": 13953.0,
+        "full_depth_units": 20200.0,
+        "depth_compute_saved_pct": 30.9257,
+        "exit_consistency": 0.9673,
+        "label_set_flip_any_rate": 0.703,
+        "avg_label_set_flip_count": 1.0587,
+        "avg_label_bit_flip_count": 1.37,
+        "macro_f1": 0.9561,
+        "micro_f1": 0.9567,
+        "samples_f1": 0.9538,
+        "exact_match": 0.9376,
+        "hamming_loss": 0.0174,
+        "hamming_accuracy": 0.9826,
+        "jaccard_score": 0.9497,
+        "micro_precision": 0.9515,
+        "micro_recall": 0.9619,
+        "macro_precision": 0.9512,
+        "macro_recall": 0.961,
+        "avg_true_labels": 1.0,
+        "avg_pred_labels": 1.0109,
+        "label_cardinality_error": 0.0381,
+        "label_cardinality_bias": 0.0109,
+        "macro_auprc": 0.9808,
+        "micro_auprc": 0.9761,
+        "mAP": 0.9808,
+        "exit1_samples": 0,
+        "exit1_fraction": 0.0,
+        "exit2_samples": 0,
+        "exit2_fraction": 0.0,
+        "exit3_samples": 2649,
+        "exit3_fraction": 0.6557,
+        "exit4_samples": 949,
+        "exit4_fraction": 0.2349,
+        "exit5_samples": 442,
+        "exit5_fraction": 0.1094
+      },
+      "best_epoch": 30,
+      "best_val_macro_f1": 0.9696852051576836
+    }
+  }
+}

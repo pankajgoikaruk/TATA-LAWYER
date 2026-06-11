@@ -1,0 +1,5 @@
+setting,macro_f1,micro_f1,samples_f1,exact_match,hamming_loss,parent_clips,segments,avg_pred_labels
+"v0.6 full holdout, 3-exit fixed + parent mean",0.7598,0.8976,0.9048,0.8155,0.0271,867,4335,
+v0.6 model on v0.7 filtered holdout,0.730815,0.900071,0.898639,0.748299,0.031973,441,2205,1.526077
+v0.7 filtered 3-exit fixed + parent mean,0.744591,0.898256,0.904082,0.759637,0.031746,441,2205,1.446712
+v0.7 filtered 3-exit tuned + parent mean,0.746804,0.895317,0.901285,0.734694,0.034467,441,2205,1.619048

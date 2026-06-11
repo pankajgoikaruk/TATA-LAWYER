@@ -1,0 +1,4 @@
+experiment,holdout,macro_f1,micro_f1,samples_f1,exact_match,hamming_loss
+v0.6 broad 3-exit old holdout,old/incomplete raw holdout,0.7598,0.8976,0.9048,0.8155,0.0271
+v0.7 filtered 3-exit,filtered target-focused holdout,0.7446,0.8983,0.9041,0.7596,0.0317
+v0.8-HCB 3-exit,corrected raw holdout,0.7801,0.9332,0.9406,0.8397,0.0194

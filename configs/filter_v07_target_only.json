@@ -1,0 +1,64 @@
+{
+  "title": "TATA v0.7 Target-Only Filter Summary",
+  "summary_name": "v07_filter_summary",
+  "metadata_dir": "metadata",
+  "exclude_source_classes": [
+    "Les_Brown",
+    "Mel_Robbins",
+    "Oprah_Winfrey",
+    "Rabin_Sharma",
+    "Simon_Sinek"
+  ],
+  "match_columns": [
+    "source_class_dir",
+    "source_file",
+    "source_path",
+    "source_rel_path",
+    "parent_clip_id"
+  ],
+  "files": [
+    {
+      "name": "final_holdout_ground_truth",
+      "src": "{src_root}/manual_review_queue/01_raw_final_holdout_GROUND_TRUTH_FINAL_refreshed.csv",
+      "dst": "{dst_root}/manual_review_queue/01_raw_final_holdout_GROUND_TRUTH_FINAL_refreshed_FILTERED_TARGET_ONLY.csv"
+    },
+    {
+      "name": "corrected_hybrid_needs_review",
+      "src": "{src_root}/manual_review_queue/02_raw_hybrid_needs_review_MANUAL_CORRECTION_FINAL_refreshed.csv",
+      "dst": "{dst_root}/manual_review_queue/02_raw_hybrid_needs_review_MANUAL_CORRECTION_FINAL_refreshed_FILTERED_TARGET_ONLY.csv"
+    },
+    {
+      "name": "hybrid_accepted",
+      "src": "{src_root}/raw_tata_pseudo_routing/hybrid/hybrid_accepted.csv",
+      "dst": "{dst_root}/raw_tata_pseudo_routing/hybrid/hybrid_accepted_FILTERED_TARGET_ONLY.csv"
+    },
+    {
+      "name": "hybrid_accepted_with_warning",
+      "src": "{src_root}/raw_tata_pseudo_routing/hybrid/hybrid_accepted_with_warning.csv",
+      "dst": "{dst_root}/raw_tata_pseudo_routing/hybrid/hybrid_accepted_with_warning_FILTERED_TARGET_ONLY.csv"
+    },
+    {
+      "name": "original_hybrid_needs_review",
+      "src": "{src_root}/raw_tata_pseudo_routing/hybrid/hybrid_needs_review.csv",
+      "dst": "{dst_root}/raw_tata_pseudo_routing/hybrid/hybrid_needs_review_FILTERED_TARGET_ONLY.csv"
+    },
+    {
+      "name": "raw_pseudo_pool_parent_manifest",
+      "src": "{src_root}/metadata/raw_pseudo_pool_parent_manifest.csv",
+      "dst": "{dst_root}/metadata/raw_pseudo_pool_parent_manifest_FILTERED_TARGET_ONLY.csv"
+    },
+    {
+      "name": "raw_final_holdout_parent_manifest",
+      "src": "{src_root}/metadata/raw_final_holdout_parent_manifest.csv",
+      "dst": "{dst_root}/metadata/raw_final_holdout_parent_manifest_FILTERED_TARGET_ONLY.csv"
+    }
+  ],
+  "copy_files": [
+    {
+      "name": "labels_json",
+      "src": "{src_root}/final_expanded_training_dataset/metadata/tata_v06_labels.json",
+      "dst": "{dst_root}/metadata/tata_v07_labels.json"
+    }
+  ],
+  "note": "v0.7 filtered experiment removes configured source classes from CSV manifests only; original audio and v0.6 files are untouched."
+}

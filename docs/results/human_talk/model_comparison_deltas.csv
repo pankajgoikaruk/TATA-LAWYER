@@ -1,0 +1,5 @@
+stage,macro_f1_3exit,macro_f1_5exit,macro_f1_delta_5_minus_3,exact_match_3exit,exact_match_5exit,compute_saved_3exit_pct,compute_saved_5exit_pct,exit_consistency_5exit,flip_rate_5exit
+clean2,0.9898,0.9898,0.0,0.9898,0.9898,0.0,19.4992,0.9953,0.1385
+clean3,0.9808,0.9792,-0.0016000000000000458,0.975,0.9729,0.0,17.5796,0.987,0.4971
+clean4,0.9789,0.9696,-0.009299999999999975,0.9667,0.9515,0.0,17.097,0.9855,0.8075
+clean5,0.9758,0.9629,-0.012900000000000023,0.9589,0.9414,0.0,16.9293,0.9778,0.731

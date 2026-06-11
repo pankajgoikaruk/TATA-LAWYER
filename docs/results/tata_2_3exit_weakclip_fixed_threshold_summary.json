@@ -1,0 +1,260 @@
+{
+  "branch": "agentic_data_preprocessing_v0.5_tata_2",
+  "config": {
+    "task": "multi_label_audio",
+    "manifest": "C:\\Users\\wwwsa\\PycharmProjects\\NeuroAccuExit-ASHADIP\\human_talk_workspace\\tata_2\\feature_cache\\metadata\\multilabel_features_manifest.csv",
+    "features_root": "C:\\Users\\wwwsa\\PycharmProjects\\NeuroAccuExit-ASHADIP\\human_talk_workspace\\tata_2\\feature_cache\\features",
+    "labels_json": "C:\\Users\\wwwsa\\PycharmProjects\\NeuroAccuExit-ASHADIP\\human_talk_workspace\\tata_2\\segment_cache\\metadata\\tata_labels.json",
+    "labels": [
+      "Brene_Brown",
+      "Eckhart_Tolle",
+      "Eric_Thomas",
+      "Gary_Vee",
+      "Jay_Shetty",
+      "Nick_Vujicic",
+      "other_speaker_present",
+      "music_present",
+      "applause_present",
+      "laughter_present",
+      "crowd_cheer_present",
+      "silence_present"
+    ],
+    "num_labels": 12,
+    "runs_root": "human_talk_workspace\\tata_2\\runs",
+    "variant": "tata_2_3exit_weakclip",
+    "run_dir": "human_talk_workspace\\tata_2\\runs\\tata_2_3exit_weakclip_20260530_121030",
+    "tap_blocks": [
+      1,
+      3
+    ],
+    "num_exits": 3,
+    "n_mels": 64,
+    "epochs": 40,
+    "batch_size": 64,
+    "num_workers": 0,
+    "lr": 0.001,
+    "weight_decay": 0.0,
+    "seed": 42,
+    "device": "cpu",
+    "threshold": 0.5,
+    "loss_weights": [
+      0.3,
+      0.3,
+      1.0
+    ],
+    "use_pos_weight": false,
+    "pos_weight_max": 20.0,
+    "label_balance_power": 0.0,
+    "synthetic_balance_power": 0.0,
+    "exit_hint": {
+      "enable": false,
+      "dim": 8,
+      "source": "probs",
+      "detach": true,
+      "use_stats": true
+    }
+  },
+  "meta": {
+    "variant": "tata_2_3exit_weakclip",
+    "tap_blocks": "1,3",
+    "started_at": "2026-05-30T12:10:27.6846180+01:00",
+    "finished_at": "2026-05-30T12:23:58.7077984+01:00",
+    "elapsed_seconds": 811.02,
+    "manifest": "human_talk_workspace\\tata_2\\feature_cache\\metadata\\multilabel_features_manifest.csv",
+    "features_root": "human_talk_workspace\\tata_2\\feature_cache\\features",
+    "labels_json": "human_talk_workspace\\tata_2\\segment_cache\\metadata\\tata_labels.json",
+    "runs_root": "human_talk_workspace\\tata_2\\runs",
+    "run_dir": "C:\\Users\\wwwsa\\PycharmProjects\\NeuroAccuExit-ASHADIP\\human_talk_workspace\\tata_2\\runs\\tata_2_3exit_weakclip_20260530_121030",
+    "transcript": "human_talk_workspace\\tata_2\\logs\\tata_2_3exit_weakclip_20260530_121027_cli_output.txt",
+    "device": "cpu",
+    "epochs": 40,
+    "batch_size": 64,
+    "lr": 0.001,
+    "threshold": 0.5,
+    "use_pos_weight": false,
+    "pos_weight_max": 20,
+    "include_checkpoint_in_package": false
+  },
+  "segment_summary": {
+    "input_clip_manifest": "human_talk_workspace\\tata_2\\metadata\\tata_clip_level_manifest_training_ready.csv",
+    "output_manifest": "human_talk_workspace\\tata_2\\segment_cache\\metadata\\tata_segment_manifest.csv",
+    "labels_json": "human_talk_workspace\\tata_2\\segment_cache\\metadata\\tata_labels.json",
+    "errors_csv": "human_talk_workspace\\tata_2\\segment_cache\\metadata\\tata_segment_manifest_errors.csv",
+    "input_rows_after_filter": 2074,
+    "segments_created": 12469,
+    "errors": 0,
+    "split_counts": {
+      "train": 8625,
+      "test": 1961,
+      "val": 1883
+    },
+    "label_counts": {
+      "Brene_Brown": 825,
+      "Eckhart_Tolle": 750,
+      "Eric_Thomas": 975,
+      "Gary_Vee": 1225,
+      "Jay_Shetty": 1585,
+      "Nick_Vujicic": 1180,
+      "other_speaker_present": 3466,
+      "music_present": 4065,
+      "applause_present": 2582,
+      "laughter_present": 1279,
+      "crowd_cheer_present": 1857,
+      "silence_present": 569
+    }
+  },
+  "parent_clips": 2074,
+  "leak_parents": 0,
+  "segments_per_parent_stats": {
+    "count": 2074.0,
+    "mean": 6.01205400192864,
+    "std": 5.455547619729784,
+    "min": 2.0,
+    "25%": 5.0,
+    "50%": 5.0,
+    "75%": 5.0,
+    "max": 109.0
+  },
+  "active_labels_per_segment_stats": {
+    "count": 12469.0,
+    "mean": 1.6326890688908493,
+    "std": 0.6520934388761721,
+    "min": 1.0,
+    "25%": 1.0,
+    "50%": 2.0,
+    "75%": 2.0,
+    "max": 5.0
+  },
+  "best_epoch": 39,
+  "best_val_macro_f1": 0.7477820310125161,
+  "test_exit_metrics": [
+    {
+      "exit": 1,
+      "micro_f1": 0.2889714993804213,
+      "macro_f1": 0.1729598781960717,
+      "samples_f1": 0.20358660547339794,
+      "micro_precision": 0.6316359696641387,
+      "micro_recall": 0.18733933161953728,
+      "macro_precision": 0.34895334924589266,
+      "macro_recall": 0.13823450619454103,
+      "exact_match": 0.06731259561448241,
+      "hamming_loss": 0.12191908890022098,
+      "avg_pred_labels": 0.47067822539520654,
+      "avg_true_labels": 1.5869454360020399
+    },
+    {
+      "exit": 2,
+      "micro_f1": 0.6191854854275236,
+      "macro_f1": 0.5468484849368077,
+      "samples_f1": 0.5303950851120661,
+      "micro_precision": 0.7752537457709038,
+      "micro_recall": 0.5154241645244216,
+      "macro_precision": 0.7827442779291259,
+      "macro_recall": 0.4660908849017247,
+      "exact_match": 0.296787353391127,
+      "hamming_loss": 0.08384327723950366,
+      "avg_pred_labels": 1.0550739418663948,
+      "avg_true_labels": 1.5869454360020399
+    },
+    {
+      "exit": 3,
+      "micro_f1": 0.7655719139297849,
+      "macro_f1": 0.7773639608170947,
+      "samples_f1": 0.7503168937131202,
+      "micro_precision": 0.7709351580319322,
+      "micro_recall": 0.7602827763496144,
+      "macro_precision": 0.8139523220485204,
+      "macro_recall": 0.760755743932302,
+      "exact_match": 0.4895461499235084,
+      "hamming_loss": 0.06157572667006629,
+      "avg_pred_labels": 1.565017848036716,
+      "avg_true_labels": 1.5869454360020399
+    }
+  ],
+  "per_label_final": {
+    "Brene_Brown": {
+      "precision": 0.7751479289940828,
+      "recall": 0.8733333333333333,
+      "f1": 0.8213166144200627,
+      "support": 150,
+      "predicted_positive": 169
+    },
+    "Eckhart_Tolle": {
+      "precision": 0.9253731343283582,
+      "recall": 0.9185185185185185,
+      "f1": 0.9219330855018587,
+      "support": 135,
+      "predicted_positive": 134
+    },
+    "Eric_Thomas": {
+      "precision": 0.8854166666666666,
+      "recall": 0.6296296296296297,
+      "f1": 0.7359307359307359,
+      "support": 135,
+      "predicted_positive": 96
+    },
+    "Gary_Vee": {
+      "precision": 0.9803921568627451,
+      "recall": 0.7894736842105263,
+      "f1": 0.8746355685131195,
+      "support": 190,
+      "predicted_positive": 153
+    },
+    "Jay_Shetty": {
+      "precision": 0.8622047244094488,
+      "recall": 0.8423076923076923,
+      "f1": 0.8521400778210116,
+      "support": 260,
+      "predicted_positive": 254
+    },
+    "Nick_Vujicic": {
+      "precision": 0.8582089552238806,
+      "recall": 0.7666666666666667,
+      "f1": 0.8098591549295775,
+      "support": 150,
+      "predicted_positive": 134
+    },
+    "other_speaker_present": {
+      "precision": 0.5654281098546042,
+      "recall": 0.684931506849315,
+      "f1": 0.6194690265486725,
+      "support": 511,
+      "predicted_positive": 619
+    },
+    "music_present": {
+      "precision": 0.9768421052631578,
+      "recall": 0.7341772151898734,
+      "f1": 0.8383017163504969,
+      "support": 632,
+      "predicted_positive": 475
+    },
+    "applause_present": {
+      "precision": 0.9072463768115943,
+      "recall": 0.8151041666666666,
+      "f1": 0.8587105624142661,
+      "support": 384,
+      "predicted_positive": 345
+    },
+    "laughter_present": {
+      "precision": 0.5608974358974359,
+      "recall": 0.720164609053498,
+      "f1": 0.6306306306306306,
+      "support": 243,
+      "predicted_positive": 312
+    },
+    "crowd_cheer_present": {
+      "precision": 0.6036036036036037,
+      "recall": 0.7976190476190477,
+      "f1": 0.6871794871794872,
+      "support": 252,
+      "predicted_positive": 333
+    },
+    "silence_present": {
+      "precision": 0.8666666666666667,
+      "recall": 0.5571428571428572,
+      "f1": 0.6782608695652174,
+      "support": 70,
+      "predicted_positive": 45
+    }
+  }
+}

@@ -1,0 +1,5 @@
+stage,n_labels,labels,n_parent_clips,n_segments,train_segments,val_segments,test_segments
+clean2,2,"Les_Brown, Simon_Sinek",944,8496,5940,1278,1278
+clean3,3,"Les_Brown, Simon_Sinek, Rabin_Sharma",1416,12744,8910,1917,1917
+clean4,4,"Les_Brown, Simon_Sinek, Rabin_Sharma, Oprah_Winfrey",1888,16992,11880,2556,2556
+clean5,5,"Les_Brown, Mel_Robbins, Oprah_Winfrey, Rabin_Sharma, Simon_Sinek",2205,19845,13905,2970,2970

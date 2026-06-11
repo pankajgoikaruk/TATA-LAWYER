@@ -1,0 +1,78 @@
+seed: 42
+
+paths:
+  data_root: data2
+  cache_root: data_caches
+  runs_root: runs
+
+audio:
+  sample_rate: 16000
+  # Wider C-class bandpass than moth setting. Keeps more high-frequency cues
+  # useful for gunshot, fireworks, crash, scream, thunderstorm, and traffic audio.
+  bandpass: [50, 7600]
+  segment_sec: 1.0
+  segment_hop: 0.5
+  silence_dbfs: -50
+
+features:
+  type: logmel
+  n_mels: 64
+  n_fft: 1024
+  win_ms: 25
+  hop_ms: 10
+  cmvn: true
+
+train:
+  batch_size: 64
+  epochs: 60
+  lr: 0.001
+  weight_decay: 0.0
+  optimizer: adam
+  num_workers: 0
+  val_every: 1
+
+  # v1b: reduced balancing strength compared with v1.
+  # Goal: keep minority-class support while recovering final/clip accuracy.
+  class_balance_power: 0.3
+  source_balance_power: 0.3
+  class_weight_power: 0.0
+  label_smoothing: 0.03
+  focal_gamma: 0.0
+  best_metric: macro_f1
+
+  # Do NOT hardcode a 3-exit or 5-exit loss schedule here.
+  # training/train.py derives this dynamically from tap_blocks:
+  #   3 exits -> [0.3, 0.3, 1.0]
+  #   5 exits -> [0.3, 0.3, 0.6, 0.8, 1.0]
+  # loss_weights: []
+
+model:
+  # Do NOT hardcode num_classes here.
+  # The dataset loader/training pipeline should infer it from segments.csv labels.
+  # num_classes: 10
+
+  # Do NOT hardcode exits here.
+  # training/train.py derives: num_exits = len(tap_blocks) + 1
+  # exits: 3
+
+  exit_hint:
+    enable: false
+    dim: 8
+    source: probs
+    detach: true
+    use_stats: true
+
+calibration:
+  temperature_scaling: true
+
+thresholds:
+  strategy: f1_under_budget
+  compute_budget_ms: 4.0
+  grid_tau: [0.70, 0.75, 0.80, 0.85, 0.90, 0.92, 0.95]
+  grid_alpha: [0.10, 0.08, 0.05, 0.03, 0.02]
+
+split:
+  train: 0.7
+  val: 0.15
+  test: 0.15
+  stratify: true

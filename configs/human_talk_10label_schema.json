@@ -1,0 +1,17 @@
+{
+  "task": "human_talk_10label_multilabel_audio",
+  "activation": "sigmoid",
+  "loss": "BCEWithLogitsLoss",
+  "labels": [
+    "Brene_Brown",
+    "Eckhart_Tolle",
+    "Eric_Thomas",
+    "Gary_Vee",
+    "Jay_Shetty",
+    "Nick_Vujicic",
+    "other_speaker_present",
+    "music_present",
+    "audience_reaction_present",
+    "silence_present"
+  ]
+}

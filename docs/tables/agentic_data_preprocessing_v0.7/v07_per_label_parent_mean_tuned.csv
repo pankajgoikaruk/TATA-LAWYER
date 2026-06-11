@@ -1,0 +1,11 @@
+label,precision,recall,f1,support,predicted_positive
+Brene_Brown,0.9848,0.8904,0.9353,73,66
+Eckhart_Tolle,1.0,0.9762,0.988,84,82
+Eric_Thomas,0.9041,0.9706,0.9362,68,73
+Gary_Vee,1.0,0.9853,0.9926,68,67
+Jay_Shetty,0.9674,0.9889,0.978,90,92
+Nick_Vujicic,1.0,0.8571,0.9231,49,42
+other_speaker_present,0.3671,0.8529,0.5133,34,79
+music_present,0.9904,0.8692,0.9258,237,208
+audience_reaction_present,0.8,0.1667,0.2759,24,5
+silence_present,0.0,0.0,0.0,11,0

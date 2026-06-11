@@ -1,0 +1,2 @@
+model,best_epoch,best_val_macro_f1,macro_f1,micro_f1,samples_f1,exact_match,hamming_loss
+v0.7 filtered 3-exit internal test,34,0.812826,0.82959,0.834296,0.834683,0.667007,0.045334

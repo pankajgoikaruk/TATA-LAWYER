@@ -1,0 +1,4 @@
+priority,weak_label,current_issue,next_action
+1,silence_present,F1=0 on filtered holdout; support=11; no positives predicted at fixed/tuned,Add/verify clear silence clips and test label-specific thresholding.
+2,audience_reaction_present,Low recall under tuned threshold and moderate F1 under fixed threshold,Targeted audience-reaction examples and error analysis.
+3,other_speaker_present,Filtering removed many non-target examples; recall/precision trade-off remains difficult,Rebuild controlled other-speaker pool without noisy background labels.

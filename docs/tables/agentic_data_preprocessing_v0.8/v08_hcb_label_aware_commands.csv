@@ -1,0 +1,11 @@
+step,purpose,command,output
+global_max_diagnostic,Evaluate whether parent-level max aggregation improves bursty labels.,"python scripts\evaluate_tata_final_holdout_parent_level.py `
+  --run_dir ""$RunDir"" `
+  --holdout_manifest ""$CorrectedHoldoutManifest"" `
+  --features_root ""$HoldoutFeaturesRoot"" `
+  --out_dir ""$HCBBRoot\evaluation\existing_script_parent_max_fixed"" `
+  --threshold_mode fixed_0p5 `
+  --aggregation max `
+  --device cpu `
+  --batch_size 128",parent_holdout_eval_fixed_0p5_max.json and parent_eval_segment_probs_fixed_0p5_max.csv
+label_aware_posthoc_analysis,Use mean probabilities for stable labels and max probabilities for audience/silence labels from the segment-probability CSV.,Post-hoc pandas calculation from parent_eval_segment_probs_fixed_0p5_max.csv; no model retraining.,Macro-F1 improved from 0.7801 to 0.8320 with high Micro-F1 retained.

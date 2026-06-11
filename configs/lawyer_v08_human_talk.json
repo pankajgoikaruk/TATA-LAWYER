@@ -1,0 +1,107 @@
+{
+  "method": "LAWYER: Label-Aware Weak-label Yield Estimation and Refinement",
+  "mode_name": "lawyer_v08",
+  "labels": [
+    "Brene_Brown",
+    "Eckhart_Tolle",
+    "Eric_Thomas",
+    "Gary_Vee",
+    "Jay_Shetty",
+    "Nick_Vujicic",
+    "other_speaker_present",
+    "music_present",
+    "audience_reaction_present",
+    "silence_present"
+  ],
+  "label_groups": {
+    "target_labels": [
+      "Brene_Brown",
+      "Eckhart_Tolle",
+      "Eric_Thomas",
+      "Gary_Vee",
+      "Jay_Shetty",
+      "Nick_Vujicic"
+    ],
+    "open_set_label": "other_speaker_present",
+    "event_labels": [
+      "music_present",
+      "audience_reaction_present",
+      "silence_present"
+    ],
+    "focus_labels": [
+      "other_speaker_present",
+      "audience_reaction_present",
+      "silence_present"
+    ]
+  },
+  "source_matching": {
+    "columns": [
+      "source_class_dir",
+      "source_file",
+      "source_path",
+      "source_rel_path",
+      "parent_clip_id"
+    ],
+    "known_non_target_source_classes": [
+      "Les_Brown",
+      "Mel_Robbins",
+      "Oprah_Winfrey",
+      "Rabin_Sharma",
+      "Simon_Sinek"
+    ]
+  },
+  "rules": {
+    "speaker_identity": {
+      "aggregation": "alpha_mean_max",
+      "alpha": 0.7,
+      "threshold": 0.5,
+      "margin_threshold": 0.1
+    },
+    "open_set": {
+      "direct_threshold": 0.55,
+      "speech_threshold": 0.55,
+      "known_max_threshold": 0.35,
+      "uncertain_low": 0.35,
+      "uncertain_high": 0.6
+    },
+    "default_event": {
+      "aggregation": "max",
+      "threshold": 0.5
+    },
+    "transient_events": {
+      "audience_reaction_present": {
+        "aggregation": "topk_mean",
+        "top_k": 2,
+        "threshold": 0.5,
+        "uncertain_low": 0.35,
+        "uncertain_high": 0.65
+      }
+    },
+    "signal_events": {
+      "silence_present": {
+        "aggregation": "max",
+        "threshold": 0.5,
+        "uncertain_low": 0.35,
+        "uncertain_high": 0.65,
+        "combine": "max",
+        "binary_col": "silence_is_acoustic_silent",
+        "energy_col": "silence_rms_dbfs",
+        "energy_threshold": -45.0,
+        "activity_col": "silence_speech_activity_ratio",
+        "activity_threshold": 0.15,
+        "acoustic_logic": "and"
+      }
+    },
+    "known_non_target_override": {
+      "enabled": true,
+      "zero_target_labels": true,
+      "force_open_set_label": true,
+      "keep_event_labels": true
+    },
+    "routing": {
+      "clean_single_target_decision": "accepted",
+      "other_only_decision": "accepted_with_warning",
+      "target_with_event_decision": "accepted_with_warning"
+    }
+  }
+}

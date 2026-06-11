@@ -1,0 +1,5 @@
+setting,macro_f1,micro_f1,samples_f1,exact_match,hamming_loss,avg_pred_labels,compute_saved
+3-exit fixed 0.5,0.7337,0.8073,0.8427,0.5767,0.0619,1.872,0.0
+3-exit tuned,0.7009,0.7858,0.8227,0.5063,0.0712,1.9804,0.0
+5-exit tuned,0.7275,0.7844,0.8134,0.4787,0.0721,2.0012,0.0
+5-exit dynamic,0.6892,0.7451,,0.391,0.0893,,18.69

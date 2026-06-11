@@ -1,0 +1,75 @@
+# configs/audio_cclass.yaml
+
+seed: 42
+
+paths:
+  data_root: data2
+  cache_root: data_caches
+  runs_root: runs
+
+audio:
+  sample_rate: 16000
+  # Wider than moth [100, 3000] because gunshot, crash, fireworks,
+  # scream, road traffic and thunderstorm can carry useful energy above 3 kHz.
+  bandpass: [50, 7600]
+  segment_sec: 1.0
+  segment_hop: 0.5
+  # Slightly more permissive than moth to avoid dropping quieter background classes.
+  silence_dbfs: -50
+
+features:
+  type: logmel
+  n_mels: 64
+  n_fft: 1024
+  win_ms: 25
+  hop_ms: 10
+  cmvn: true
+
+train:
+  batch_size: 64
+  epochs: 60
+  lr: 0.001
+  weight_decay: 0.0
+  optimizer: adam
+  num_workers: 0
+  val_every: 1
+
+  # C-class v1 imbalance controls.
+  # 0.0 = disabled, 0.5 = moderate/sqrt balancing, 1.0 = full inverse-frequency.
+  class_balance_power: 0.5
+  source_balance_power: 0.5
+  class_weight_power: 0.0
+
+  # Multi-class regularisation. Helps reduce over-confidence on noisy/overlapping classes.
+  label_smoothing: 0.05
+  focal_gamma: 0.0
+
+  # For C-class, select the checkpoint using macro-F1 rather than accuracy only.
+  best_metric: macro_f1
+
+  # Leave empty so training/train.py derives this from the number of exits.
+  # loss_weights: []
+
+model:
+  # num_classes is detected automatically from segments.csv.
+  exit_hint:
+    enable: false
+    dim: 8
+    source: probs
+    detach: true
+    use_stats: true
+
+calibration:
+  temperature_scaling: true
+
+thresholds:
+  strategy: f1_under_budget
+  compute_budget_ms: 4.0
+  grid_tau: [0.70, 0.75, 0.80, 0.85, 0.90, 0.92, 0.95]
+  grid_alpha: [0.10, 0.08, 0.05, 0.03, 0.02]
+
+split:
+  train: 0.7
+  val: 0.15
+  test: 0.15
+  stratify: true

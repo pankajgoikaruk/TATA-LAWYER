@@ -1,0 +1,4 @@
+evaluation,macro_f1,micro_f1,samples_f1,exact_match,hamming_loss,avg_pred_labels
+Segment-level,0.729,0.8476,0.8507,0.7301,0.0409,1.3409
+Parent max,0.7337,0.8073,0.8427,0.5767,0.0619,1.872
+Parent mean,0.7598,0.8976,0.9048,0.8155,0.0271,1.3045

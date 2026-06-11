@@ -1,0 +1,620 @@
+{
+  "branch": "agentic_data_preprocessing_v0.5_tata_2",
+  "dataset": {
+    "parent_clips_training_ready": 2074,
+    "segments": 12469,
+    "labels": [
+      "Brene_Brown",
+      "Eckhart_Tolle",
+      "Eric_Thomas",
+      "Gary_Vee",
+      "Jay_Shetty",
+      "Nick_Vujicic",
+      "other_speaker_present",
+      "music_present",
+      "applause_present",
+      "laughter_present",
+      "crowd_cheer_present",
+      "silence_present"
+    ],
+    "segment_build_errors": 0,
+    "parent_clip_leakage": 0
+  },
+  "results": {
+    "3exit_fixed": {
+      "thresholds": {
+        "Brene_Brown": 0.5,
+        "Eckhart_Tolle": 0.5,
+        "Eric_Thomas": 0.5,
+        "Gary_Vee": 0.5,
+        "Jay_Shetty": 0.5,
+        "Nick_Vujicic": 0.5,
+        "other_speaker_present": 0.5,
+        "music_present": 0.5,
+        "applause_present": 0.5,
+        "laughter_present": 0.5,
+        "crowd_cheer_present": 0.5,
+        "silence_present": 0.5
+      },
+      "micro_f1": 0.7655719139297849,
+      "macro_f1": 0.7773639608170947,
+      "samples_f1": 0.7503168937131202,
+      "micro_precision": 0.7709351580319322,
+      "micro_recall": 0.7602827763496144,
+      "macro_precision": 0.8139523220485204,
+      "macro_recall": 0.760755743932302,
+      "exact_match": 0.4895461499235084,
+      "hamming_loss": 0.06157572667006629,
+      "avg_true_labels": 1.5869454360020399,
+      "avg_pred_labels": 1.565017848036716,
+      "per_label": {
+        "Brene_Brown": {
+          "threshold": 0.5,
+          "precision": 0.7751479289940828,
+          "recall": 0.8733333333333333,
+          "f1": 0.8213166144200627,
+          "support": 150,
+          "predicted_positive": 169
+        },
+        "Eckhart_Tolle": {
+          "threshold": 0.5,
+          "precision": 0.9253731343283582,
+          "recall": 0.9185185185185185,
+          "f1": 0.9219330855018587,
+          "support": 135,
+          "predicted_positive": 134
+        },
+        "Eric_Thomas": {
+          "threshold": 0.5,
+          "precision": 0.8854166666666666,
+          "recall": 0.6296296296296297,
+          "f1": 0.7359307359307359,
+          "support": 135,
+          "predicted_positive": 96
+        },
+        "Gary_Vee": {
+          "threshold": 0.5,
+          "precision": 0.9803921568627451,
+          "recall": 0.7894736842105263,
+          "f1": 0.8746355685131195,
+          "support": 190,
+          "predicted_positive": 153
+        },
+        "Jay_Shetty": {
+          "threshold": 0.5,
+          "precision": 0.8622047244094488,
+          "recall": 0.8423076923076923,
+          "f1": 0.8521400778210116,
+          "support": 260,
+          "predicted_positive": 254
+        },
+        "Nick_Vujicic": {
+          "threshold": 0.5,
+          "precision": 0.8582089552238806,
+          "recall": 0.7666666666666667,
+          "f1": 0.8098591549295775,
+          "support": 150,
+          "predicted_positive": 134
+        },
+        "other_speaker_present": {
+          "threshold": 0.5,
+          "precision": 0.5654281098546042,
+          "recall": 0.684931506849315,
+          "f1": 0.6194690265486725,
+          "support": 511,
+          "predicted_positive": 619
+        },
+        "music_present": {
+          "threshold": 0.5,
+          "precision": 0.9768421052631578,
+          "recall": 0.7341772151898734,
+          "f1": 0.8383017163504969,
+          "support": 632,
+          "predicted_positive": 475
+        },
+        "applause_present": {
+          "threshold": 0.5,
+          "precision": 0.9072463768115943,
+          "recall": 0.8151041666666666,
+          "f1": 0.8587105624142661,
+          "support": 384,
+          "predicted_positive": 345
+        },
+        "laughter_present": {
+          "threshold": 0.5,
+          "precision": 0.5608974358974359,
+          "recall": 0.720164609053498,
+          "f1": 0.6306306306306306,
+          "support": 243,
+          "predicted_positive": 312
+        },
+        "crowd_cheer_present": {
+          "threshold": 0.5,
+          "precision": 0.6036036036036037,
+          "recall": 0.7976190476190477,
+          "f1": 0.6871794871794872,
+          "support": 252,
+          "predicted_positive": 333
+        },
+        "silence_present": {
+          "threshold": 0.5,
+          "precision": 0.8666666666666667,
+          "recall": 0.5571428571428572,
+          "f1": 0.6782608695652174,
+          "support": 70,
+          "predicted_positive": 45
+        }
+      }
+    },
+    "3exit_tuned": {
+      "thresholds": {
+        "Brene_Brown": 0.8500000238418579,
+        "Eckhart_Tolle": 0.6399999856948853,
+        "Eric_Thomas": 0.20000000298023224,
+        "Gary_Vee": 0.4099999964237213,
+        "Jay_Shetty": 0.27000001072883606,
+        "Nick_Vujicic": 0.4399999976158142,
+        "other_speaker_present": 0.4000000059604645,
+        "music_present": 0.15000000596046448,
+        "applause_present": 0.5,
+        "laughter_present": 0.7200000286102295,
+        "crowd_cheer_present": 0.3499999940395355,
+        "silence_present": 0.30000001192092896
+      },
+      "micro_f1": 0.7796296296296297,
+      "macro_f1": 0.7915551648743501,
+      "samples_f1": 0.761882907165926,
+      "micro_precision": 0.75,
+      "micro_recall": 0.8116966580976864,
+      "macro_precision": 0.7928000814306423,
+      "macro_recall": 0.804673884365603,
+      "exact_match": 0.47322794492605813,
+      "hamming_loss": 0.06068332483426823,
+      "avg_true_labels": 1.5869454360020399,
+      "avg_pred_labels": 1.717491075981642,
+      "per_label": {
+        "Brene_Brown": {
+          "threshold": 0.8500000238418579,
+          "precision": 0.8814814814814815,
+          "recall": 0.7933333333333333,
+          "f1": 0.8350877192982457,
+          "support": 150,
+          "predicted_positive": 135
+        },
+        "Eckhart_Tolle": {
+          "threshold": 0.6399999856948853,
+          "precision": 0.9461538461538461,
+          "recall": 0.9111111111111111,
+          "f1": 0.9283018867924528,
+          "support": 135,
+          "predicted_positive": 130
+        },
+        "Eric_Thomas": {
+          "threshold": 0.20000000298023224,
+          "precision": 0.7605633802816901,
+          "recall": 0.8,
+          "f1": 0.779783393501805,
+          "support": 135,
+          "predicted_positive": 142
+        },
+        "Gary_Vee": {
+          "threshold": 0.4099999964237213,
+          "precision": 0.9636363636363636,
+          "recall": 0.8368421052631579,
+          "f1": 0.895774647887324,
+          "support": 190,
+          "predicted_positive": 165
+        },
+        "Jay_Shetty": {
+          "threshold": 0.27000001072883606,
+          "precision": 0.7617554858934169,
+          "recall": 0.9346153846153846,
+          "f1": 0.8393782383419689,
+          "support": 260,
+          "predicted_positive": 319
+        },
+        "Nick_Vujicic": {
+          "threshold": 0.4399999976158142,
+          "precision": 0.8561151079136691,
+          "recall": 0.7933333333333333,
+          "f1": 0.8235294117647058,
+          "support": 150,
+          "predicted_positive": 139
+        },
+        "other_speaker_present": {
+          "threshold": 0.4000000059604645,
+          "precision": 0.510752688172043,
+          "recall": 0.7436399217221135,
+          "f1": 0.6055776892430279,
+          "support": 511,
+          "predicted_positive": 744
+        },
+        "music_present": {
+          "threshold": 0.15000000596046448,
+          "precision": 0.9187817258883249,
+          "recall": 0.8591772151898734,
+          "f1": 0.8879803761242846,
+          "support": 632,
+          "predicted_positive": 591
+        },
+        "applause_present": {
+          "threshold": 0.5,
+          "precision": 0.9072463768115943,
+          "recall": 0.8151041666666666,
+          "f1": 0.8587105624142661,
+          "support": 384,
+          "predicted_positive": 345
+        },
+        "laughter_present": {
+          "threshold": 0.7200000286102295,
+          "precision": 0.7397959183673469,
+          "recall": 0.5967078189300411,
+          "f1": 0.6605922551252847,
+          "support": 243,
+          "predicted_positive": 196
+        },
+        "crowd_cheer_present": {
+          "threshold": 0.3499999940395355,
+          "precision": 0.5761421319796954,
+          "recall": 0.9007936507936508,
+          "f1": 0.7027863777089783,
+          "support": 252,
+          "predicted_positive": 394
+        },
+        "silence_present": {
+          "threshold": 0.30000001192092896,
+          "precision": 0.6911764705882353,
+          "recall": 0.6714285714285714,
+          "f1": 0.6811594202898551,
+          "support": 70,
+          "predicted_positive": 68
+        }
+      }
+    },
+    "3exit_dynamic_policy": {
+      "model": "tata_2_3exit_weakclip",
+      "run_dir": "C:\\Users\\wwwsa\\PycharmProjects\\NeuroAccuExit-ASHADIP\\human_talk_workspace\\tata_2\\runs\\tata_2_3exit_weakclip_20260530_121030",
+      "split": "test",
+      "policy": "label_set_stability",
+      "threshold_mode": "tuned_per_exit",
+      "min_exit": 2,
+      "stable_k": 2,
+      "allow_empty_stop": false,
+      "n_samples": 1961,
+      "num_exits": 3,
+      "avg_exit_depth": 3.0,
+      "final_exit_depth": 3,
+      "policy_depth_units": 5883.0,
+      "full_depth_units": 5883.0,
+      "depth_compute_saved_pct": 0.0,
+      "exit_consistency": 1.0,
+      "label_set_flip_any_rate": 0.9852,
+      "avg_label_set_flip_count": 1.5727,
+      "avg_label_bit_flip_count": 3.8144,
+      "macro_f1": 0.7916,
+      "micro_f1": 0.7796,
+      "samples_f1": 0.7619,
+      "exact_match": 0.4732,
+      "hamming_loss": 0.0607,
+      "hamming_accuracy": 0.9393,
+      "jaccard_score": 0.6926,
+      "micro_precision": 0.75,
+      "micro_recall": 0.8117,
+      "macro_precision": 0.7928,
+      "macro_recall": 0.8047,
+      "avg_true_labels": 1.5869,
+      "avg_pred_labels": 1.7175,
+      "label_cardinality_error": 0.4773,
+      "label_cardinality_bias": 0.1305,
+      "macro_auprc": 0.8611,
+      "micro_auprc": 0.8587,
+      "mAP": 0.8611,
+      "exit1_samples": 0,
+      "exit1_fraction": 0.0,
+      "exit2_samples": 0,
+      "exit2_fraction": 0.0,
+      "exit3_samples": 1961,
+      "exit3_fraction": 1.0
+    },
+    "5exit_fixed": {
+      "thresholds": {
+        "Brene_Brown": 0.5,
+        "Eckhart_Tolle": 0.5,
+        "Eric_Thomas": 0.5,
+        "Gary_Vee": 0.5,
+        "Jay_Shetty": 0.5,
+        "Nick_Vujicic": 0.5,
+        "other_speaker_present": 0.5,
+        "music_present": 0.5,
+        "applause_present": 0.5,
+        "laughter_present": 0.5,
+        "crowd_cheer_present": 0.5,
+        "silence_present": 0.5
+      },
+      "micro_f1": 0.7665457058925177,
+      "macro_f1": 0.7528795583483664,
+      "samples_f1": 0.724166484543843,
+      "micro_precision": 0.8291588785046728,
+      "micro_recall": 0.7127249357326478,
+      "macro_precision": 0.826400000957694,
+      "macro_recall": 0.7076523983589885,
+      "exact_match": 0.5012748597654259,
+      "hamming_loss": 0.057411184769675334,
+      "avg_true_labels": 1.5869454360020399,
+      "avg_pred_labels": 1.3640999490056094,
+      "per_label": {
+        "Brene_Brown": {
+          "threshold": 0.5,
+          "precision": 0.8518518518518519,
+          "recall": 0.7666666666666667,
+          "f1": 0.8070175438596491,
+          "support": 150,
+          "predicted_positive": 135
+        },
+        "Eckhart_Tolle": {
+          "threshold": 0.5,
+          "precision": 0.8680555555555556,
+          "recall": 0.9259259259259259,
+          "f1": 0.8960573476702509,
+          "support": 135,
+          "predicted_positive": 144
+        },
+        "Eric_Thomas": {
+          "threshold": 0.5,
+          "precision": 0.7768595041322314,
+          "recall": 0.6962962962962963,
+          "f1": 0.734375,
+          "support": 135,
+          "predicted_positive": 121
+        },
+        "Gary_Vee": {
+          "threshold": 0.5,
+          "precision": 0.9675324675324676,
+          "recall": 0.7842105263157895,
+          "f1": 0.8662790697674418,
+          "support": 190,
+          "predicted_positive": 154
+        },
+        "Jay_Shetty": {
+          "threshold": 0.5,
+          "precision": 0.848,
+          "recall": 0.8153846153846154,
+          "f1": 0.8313725490196079,
+          "support": 260,
+          "predicted_positive": 250
+        },
+        "Nick_Vujicic": {
+          "threshold": 0.5,
+          "precision": 0.8769230769230769,
+          "recall": 0.76,
+          "f1": 0.8142857142857143,
+          "support": 150,
+          "predicted_positive": 130
+        },
+        "other_speaker_present": {
+          "threshold": 0.5,
+          "precision": 0.7102272727272727,
+          "recall": 0.4892367906066536,
+          "f1": 0.5793742757821553,
+          "support": 511,
+          "predicted_positive": 352
+        },
+        "music_present": {
+          "threshold": 0.5,
+          "precision": 0.9473684210526315,
+          "recall": 0.8544303797468354,
+          "f1": 0.8985024958402662,
+          "support": 632,
+          "predicted_positive": 570
+        },
+        "applause_present": {
+          "threshold": 0.5,
+          "precision": 0.9237536656891495,
+          "recall": 0.8203125,
+          "f1": 0.8689655172413793,
+          "support": 384,
+          "predicted_positive": 341
+        },
+        "laughter_present": {
+          "threshold": 0.5,
+          "precision": 0.7105263157894737,
+          "recall": 0.3333333333333333,
+          "f1": 0.453781512605042,
+          "support": 243,
+          "predicted_positive": 114
+        },
+        "crowd_cheer_present": {
+          "threshold": 0.5,
+          "precision": 0.5820433436532507,
+          "recall": 0.746031746031746,
+          "f1": 0.6539130434782608,
+          "support": 252,
+          "predicted_positive": 323
+        },
+        "silence_present": {
+          "threshold": 0.5,
+          "precision": 0.8536585365853658,
+          "recall": 0.5,
+          "f1": 0.6306306306306306,
+          "support": 70,
+          "predicted_positive": 41
+        }
+      }
+    },
+    "5exit_tuned": {
+      "thresholds": {
+        "Brene_Brown": 0.5799999833106995,
+        "Eckhart_Tolle": 0.7099999785423279,
+        "Eric_Thomas": 0.44999998807907104,
+        "Gary_Vee": 0.28999999165534973,
+        "Jay_Shetty": 0.3199999928474426,
+        "Nick_Vujicic": 0.33000001311302185,
+        "other_speaker_present": 0.25,
+        "music_present": 0.49000000953674316,
+        "applause_present": 0.5,
+        "laughter_present": 0.28999999165534973,
+        "crowd_cheer_present": 0.3499999940395355,
+        "silence_present": 0.4699999988079071
+      },
+      "micro_f1": 0.7503063725490197,
+      "macro_f1": 0.7577924938766963,
+      "samples_f1": 0.7286515626138267,
+      "micro_precision": 0.71692037470726,
+      "micro_recall": 0.7869537275064268,
+      "macro_precision": 0.7712779394983554,
+      "macro_recall": 0.7664989241331819,
+      "exact_match": 0.43141254462009176,
+      "hamming_loss": 0.06926738058813531,
+      "avg_true_labels": 1.5869454360020399,
+      "avg_pred_labels": 1.7419683834778175,
+      "per_label": {
+        "Brene_Brown": {
+          "threshold": 0.5799999833106995,
+          "precision": 0.8809523809523809,
+          "recall": 0.74,
+          "f1": 0.8043478260869565,
+          "support": 150,
+          "predicted_positive": 126
+        },
+        "Eckhart_Tolle": {
+          "threshold": 0.7099999785423279,
+          "precision": 0.8897058823529411,
+          "recall": 0.8962962962962963,
+          "f1": 0.8929889298892989,
+          "support": 135,
+          "predicted_positive": 136
+        },
+        "Eric_Thomas": {
+          "threshold": 0.44999998807907104,
+          "precision": 0.768,
+          "recall": 0.7111111111111111,
+          "f1": 0.7384615384615385,
+          "support": 135,
+          "predicted_positive": 125
+        },
+        "Gary_Vee": {
+          "threshold": 0.28999999165534973,
+          "precision": 0.9106145251396648,
+          "recall": 0.8578947368421053,
+          "f1": 0.8834688346883469,
+          "support": 190,
+          "predicted_positive": 179
+        },
+        "Jay_Shetty": {
+          "threshold": 0.3199999928474426,
+          "precision": 0.750788643533123,
+          "recall": 0.9153846153846154,
+          "f1": 0.8249566724436742,
+          "support": 260,
+          "predicted_positive": 317
+        },
+        "Nick_Vujicic": {
+          "threshold": 0.33000001311302185,
+          "precision": 0.8243243243243243,
+          "recall": 0.8133333333333334,
+          "f1": 0.8187919463087249,
+          "support": 150,
+          "predicted_positive": 148
+        },
+        "other_speaker_present": {
+          "threshold": 0.25,
+          "precision": 0.47347994825355755,
+          "recall": 0.7162426614481409,
+          "f1": 0.5700934579439252,
+          "support": 511,
+          "predicted_positive": 773
+        },
+        "music_present": {
+          "threshold": 0.49000000953674316,
+          "precision": 0.9392361111111112,
+          "recall": 0.8560126582278481,
+          "f1": 0.8956953642384106,
+          "support": 632,
+          "predicted_positive": 576
+        },
+        "applause_present": {
+          "threshold": 0.5,
+          "precision": 0.9237536656891495,
+          "recall": 0.8203125,
+          "f1": 0.8689655172413793,
+          "support": 384,
+          "predicted_positive": 341
+        },
+        "laughter_present": {
+          "threshold": 0.28999999165534973,
+          "precision": 0.5166666666666667,
+          "recall": 0.5102880658436214,
+          "f1": 0.5134575569358178,
+          "support": 243,
+          "predicted_positive": 240
+        },
+        "crowd_cheer_present": {
+          "threshold": 0.3499999940395355,
+          "precision": 0.5241545893719807,
+          "recall": 0.8611111111111112,
+          "f1": 0.6516516516516516,
+          "support": 252,
+          "predicted_positive": 414
+        },
+        "silence_present": {
+          "threshold": 0.4699999988079071,
+          "precision": 0.8536585365853658,
+          "recall": 0.5,
+          "f1": 0.6306306306306306,
+          "support": 70,
+          "predicted_positive": 41
+        }
+      }
+    },
+    "5exit_dynamic_policy": {
+      "model": "tata_2_5exit_weakclip",
+      "run_dir": "C:\\Users\\wwwsa\\PycharmProjects\\NeuroAccuExit-ASHADIP\\human_talk_workspace\\tata_2\\runs\\tata_2_5exit_weakclip_20260531_002128",
+      "split": "test",
+      "policy": "label_set_stability",
+      "threshold_mode": "tuned_per_exit",
+      "min_exit": 2,
+      "stable_k": 2,
+      "allow_empty_stop": false,
+      "n_samples": 1961,
+      "num_exits": 5,
+      "avg_exit_depth": 4.1198,
+      "final_exit_depth": 5,
+      "policy_depth_units": 8079.0,
+      "full_depth_units": 9805.0,
+      "depth_compute_saved_pct": 17.6033,
+      "exit_consistency": 0.7338,
+      "label_set_flip_any_rate": 0.9878,
+      "avg_label_set_flip_count": 2.5135,
+      "avg_label_bit_flip_count": 4.5752,
+      "macro_f1": 0.7166,
+      "micro_f1": 0.7081,
+      "samples_f1": 0.6848,
+      "exact_match": 0.3376,
+      "hamming_loss": 0.0847,
+      "hamming_accuracy": 0.9153,
+      "jaccard_score": 0.6003,
+      "micro_precision": 0.6503,
+      "micro_recall": 0.7773,
+      "macro_precision": 0.7077,
+      "macro_recall": 0.7544,
+      "avg_true_labels": 1.5869,
+      "avg_pred_labels": 1.897,
+      "label_cardinality_error": 0.6456,
+      "label_cardinality_bias": 0.31,
+      "macro_auprc": 0.7698,
+      "micro_auprc": 0.815,
+      "mAP": 0.7698,
+      "exit1_samples": 0,
+      "exit1_fraction": 0.0,
+      "exit2_samples": 0,
+      "exit2_fraction": 0.0,
+      "exit3_samples": 570,
+      "exit3_fraction": 0.2907,
+      "exit4_samples": 586,
+      "exit4_fraction": 0.2988,
+      "exit5_samples": 805,
+      "exit5_fraction": 0.4105
+    }
+  },
+  "conclusion": "3-exit tuned threshold is the best overall quality result; 5-exit fixed has better exact match/hamming; 5-exit dynamic saves 17.60% compute but quality is too low."
+}

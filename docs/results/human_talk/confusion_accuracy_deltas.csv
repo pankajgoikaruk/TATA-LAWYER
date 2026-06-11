@@ -1,0 +1,17 @@
+stage,stage_label,comparison,accuracy_3exit,accuracy_5exit,accuracy_delta_5_minus_3,errors_3exit,errors_5exit,worst_class_3exit,worst_class_5exit
+clean2,2 speakers,Segment selected policy,0.9898278560250392,0.9898278560250392,0.0,13,13,Simon_Sinek,Les_Brown
+clean2,2 speakers,Segment final exit,0.9898278560250392,0.9929577464788732,0.0031298904538341,13,9,Simon_Sinek,Les_Brown
+clean2,2 speakers,Clip dynamic policy,0.9929577464788732,1.0,0.0070422535211267,1,0,Simon_Sinek,Les_Brown
+clean2,2 speakers,Clip full final,1.0,1.0,0.0,0,0,Les_Brown,Les_Brown
+clean3,3 speakers,Segment selected policy,0.9812206572769951,0.9801773604590506,-0.0010432968179446,36,38,Simon_Sinek,Simon_Sinek
+clean3,3 speakers,Segment final exit,0.9812206572769951,0.9812206572769951,0.0,36,36,Simon_Sinek,Simon_Sinek
+clean3,3 speakers,Clip dynamic policy,0.9906103286384976,0.9906103286384976,0.0,2,2,Simon_Sinek,Simon_Sinek
+clean3,3 speakers,Clip full final,1.0,1.0,0.0,0,0,Les_Brown,Les_Brown
+clean4,4 speakers,Segment selected policy,0.9812206572769951,0.9800469483568076,-0.0011737089201877,48,51,Simon_Sinek,Simon_Sinek
+clean4,4 speakers,Segment final exit,0.9812206572769951,0.9827856025039124,0.001564945226917,48,44,Simon_Sinek,Simon_Sinek
+clean4,4 speakers,Clip dynamic policy,0.9929577464788732,1.0,0.0070422535211267,2,0,Simon_Sinek,Les_Brown
+clean4,4 speakers,Clip full final,0.9964788732394366,1.0,0.0035211267605633,1,0,Oprah_Winfrey,Les_Brown
+clean5,5 speakers,Segment selected policy,0.9848484848484848,0.9666666666666668,-0.0181818181818181,45,99,Simon_Sinek,Simon_Sinek
+clean5,5 speakers,Segment final exit,0.9848484848484848,0.9703703703703704,-0.0144781144781145,45,88,Simon_Sinek,Simon_Sinek
+clean5,5 speakers,Clip dynamic policy,1.0,0.987878787878788,-0.012121212121212,0,4,Les_Brown,Oprah_Winfrey
+clean5,5 speakers,Clip full final,1.0,0.993939393939394,-0.0060606060606061,0,2,Les_Brown,Oprah_Winfrey

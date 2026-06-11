@@ -1,0 +1,4 @@
+model,threshold_mode,aggregation,exit,macro_f1,micro_f1,samples_f1,exact_match,hamming_loss,jaccard_score,avg_true_labels,avg_pred_labels
+v0.8-HCB 3-exit,tuned_per_exit,mean,1,0.375631249,0.5239191609,0.5469663682,0.15455594,0.2146482122,0.435554,1.469435,3.039216
+v0.8-HCB 3-exit,tuned_per_exit,mean,2,0.7134431667,0.8106725146,0.8327950788,0.5409457901,0.0597462514,0.767109,1.469435,1.686275
+v0.8-HCB 3-exit,tuned_per_exit,mean,3,0.7487473744,0.9139126887,0.9210303729,0.8143021915,0.0243367935,0.895521,1.469435,1.357555

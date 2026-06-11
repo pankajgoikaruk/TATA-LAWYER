@@ -1,0 +1,72 @@
+# configs/audio_moth.yaml
+
+seed: 42
+
+paths:
+  data_root: data
+  cache_root: data_cache   # Edit version here if needed, e.g. data_cache_V0
+  runs_root: runs          # Edit this directory name to store results by version
+
+audio:
+  sample_rate: 16000
+  bandpass: [100, 3000]
+  segment_sec: 1.0
+  segment_hop: 0.5
+  silence_dbfs: -40
+
+features:
+  type: logmel
+  n_mels: 64
+  n_fft: 1024
+  win_ms: 25
+  hop_ms: 10
+  cmvn: true
+
+train:
+  batch_size: 64
+  epochs: 40
+  lr: 0.001
+  weight_decay: 0.0
+  optimizer: adam
+  num_workers: 0
+  val_every: 1
+
+  # Do NOT hardcode a 3-exit or 5-exit loss schedule here.
+  # The updated training/train.py should set this dynamically:
+  #   3 exits -> [0.3, 0.3, 1.0]
+  #   5 exits -> [0.3, 0.3, 0.6, 0.8, 1.0]
+  #
+  # Leave this commented out unless you intentionally want to override it.
+  # loss_weights: []
+
+model:
+  # num_classes: 2 # num_classes is now detected automatically from segments.csv
+
+  # Do NOT hardcode exits here.
+  # The updated training/train.py should derive:
+  #   num_exits = len(tap_blocks) + 1
+  # and then save the effective value into config_used.yaml.
+  #
+  # exits: 3
+
+  exit_hint:
+    enable: false
+    dim: 8
+    source: probs
+    detach: true
+    use_stats: true
+
+calibration:
+  temperature_scaling: true
+
+thresholds:
+  strategy: f1_under_budget
+  compute_budget_ms: 4.0
+  grid_tau: [0.70, 0.75, 0.80, 0.85, 0.90, 0.92, 0.95]
+  grid_alpha: [0.10, 0.08, 0.05, 0.03, 0.02]
+
+split:
+  train: 0.7
+  val: 0.15
+  test: 0.15
+  stratify: true
