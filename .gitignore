@@ -9,6 +9,7 @@ env/
 .ipynb_checkpoints/
 
 # Data / audio / generated artifacts
+dataset/
 human_talk_workspace/
 human_talk_dataset/
 human_talk_tata_seed_dataset/
@@ -37,3 +38,4 @@ final_holdout_feature_cache/
 Thumbs.db
 .idea/
 .vscode/
+.venv/

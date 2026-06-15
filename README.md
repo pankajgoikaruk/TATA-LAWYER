@@ -1,50 +1,50 @@
+# NeuroAccuExit-ASHADIP Human-Talk Pipeline
+
+This repository contains the TATA-assisted human-talk preprocessing and multi-label early-exit experiments used by the NeuroAccuExit-ASHADIP project.
+
+The documentation currently distinguishes two separate experimental tracks:
+
+1. **v0.8 human-corrected-balanced main model** — evaluated at parent level on the corrected final holdout.
+2. **v0.9 TATA triage model** — rebuilt from the audited seed data and extended with low-energy silence recovery experiments.
+
+These tracks must not be compared as if they used the same model, prediction level, or evaluation set.
+
 ---
 
-## Post-hoc label-aware aggregation finding
+## 1. Ten-label schema
 
-After the official v0.8-HCB corrected-holdout evaluation, an additional aggregation analysis was performed to understand the weak transient labels:
+The current human-talk schema contains:
 
 ```text
+Brene_Brown
+Eckhart_Tolle
+Eric_Thomas
+Gary_Vee
+Jay_Shetty
+Nick_Vujicic
+other_speaker_present
+music_present
 audience_reaction_present
 silence_present
 ```
 
-The official parent-level mean result remains the main overall result:
+Overlapping labels are valid. A one-second segment may contain a target speaker, another speaker, music, and audience reaction simultaneously.
+
+---
+
+## 2. v0.8 main-model result
+
+The official v0.8-HCB corrected-holdout result uses parent-level mean probability aggregation, a fixed threshold of 0.5, and Exit 3.
 
 | Method | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
 |---|---:|---:|---:|---:|---:|
 | Parent mean, fixed 0.5 | 0.7801 | **0.9332** | **0.9406** | **0.8397** | **0.0194** |
 
-However, global max aggregation showed that the weak transient labels were being diluted by mean aggregation:
-
-| Label | Parent mean F1 | Global max F1 |
-|---|---:|---:|
-| `audience_reaction_present` | 0.1250 | **0.4706** |
-| `silence_present` | 0.0000 | **0.1739** |
-
-Global max was not suitable as the final method because it over-predicted labels:
-
-| Method | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss | Avg Pred Labels |
-|---|---:|---:|---:|---:|---:|---:|
-| Parent mean | **0.7801** | **0.9332** | **0.9406** | **0.8397** | **0.0194** | 1.4302 |
-| Global max | 0.7251 | 0.8203 | 0.8423 | 0.5121 | 0.0630 | 2.0346 |
-
-The best post-hoc compromise was label-aware aggregation:
+A post-hoc label-aware aggregation analysis used mean aggregation for eight stable labels and max aggregation for the two transient labels:
 
 ```text
-mean for 8 stable labels:
-  Brene_Brown
-  Eckhart_Tolle
-  Eric_Thomas
-  Gary_Vee
-  Jay_Shetty
-  Nick_Vujicic
-  other_speaker_present
-  music_present
-
-max for 2 transient labels:
-  audience_reaction_present
-  silence_present
+audience_reaction_present
+silence_present
 ```
 
 | Method | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
@@ -52,167 +52,231 @@ max for 2 transient labels:
 | Parent mean official | 0.7801 | **0.9332** | **0.9406** | **0.8397** | **0.0194** |
 | Label-aware mean/max | **0.8320** | 0.9285 | 0.9375 | 0.8235 | 0.0211 |
 
-**Interpretation:** parent mean remains the official overall result, while label-aware mean/max is an additional research finding showing that rare transient labels can be recovered without retraining.
+Global max aggregation was diagnostic only because it over-predicted labels:
 
-## Updated figure locations
+| Method | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss | Avg Pred Labels |
+|---|---:|---:|---:|---:|---:|---:|
+| Parent mean | **0.7801** | **0.9332** | **0.9406** | **0.8397** | **0.0194** | 1.4302 |
+| Global max | 0.7251 | 0.8203 | 0.8423 | 0.5121 | 0.0630 | 2.0346 |
 
-All v0.8 human-talk figures should be stored under:
+The earlier 93–94% Samples-F1 and 82–84% Exact Match values belong to this **parent-level main-model evaluation**, not to the one-second TATA triage test.
+
+---
+
+## 3. v0.9 workspace and data lineage
+
+The v0.9 workspace separates the TATA triage model from the downstream NeuroAccuExit main model:
 
 ```text
-docs/figures/human_talk/agentic_data_preprocessing_v0.8/
+human_talk_workspace/
+└── tata_v0.9_pipeline/
+    ├── tata_triage_model/
+    │   ├── metadata/
+    │   ├── feature_cache/
+    │   ├── runs/
+    │   ├── manual_review/
+    │   └── silence_recovered_v09/
+    ├── neuroaccuexit_main_model/
+    └── shared/
 ```
 
-Recommended v0.8 figure references:
+### Baseline assets
 
-```markdown
-![Training validation curve](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_training_validation_curve.png)
-![Training loss and hamming curve](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_training_loss_hamming_curve.png)
-![Label balance plot](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_label_counts_before_after_balance.png)
-![Internal test by exit](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_internal_test_by_exit_lineplot.png)
-![Corrected holdout by exit](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_corrected_holdout_fixed_by_exit_lineplot.png)
-![v0.8 vs v0.6 corrected holdout](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_vs_v06_corrected_holdout_bar.png)
-![v0.8 vs v0.6 hamming loss](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_vs_v06_hamming_loss_bar.png)
-![Per-label corrected holdout F1](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_corrected_holdout_per_label_f1_bar.png)
-![Average true vs predicted labels](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_avg_true_vs_pred_labels_bar.png)
-![Aggregation strategy comparison](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_aggregation_strategy_lineplot.png)
-![Aggregation hamming loss](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_aggregation_hamming_loss_lineplot.png)
-![Weak transient label F1](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_weak_label_f1_lineplot.png)
-```
+The baseline was copied rather than edited in place:
 
-## Updated documentation map
-
-The v0.8 human-talk documentation should use these locations:
-
-<<<<<<< HEAD
 ```text
-docs/reports/human_talk/V08_HUMAN_CORRECTED_BALANCED_EXPERIMENT_REPORT.md
-docs/results/human_talk/V08_RESULTS_SUMMARY.md
-docs/tables/agentic_data_preprocessing_v0.8/
-docs/figures/human_talk/agentic_data_preprocessing_v0.8/
-docs/COMMANDS_V08.md
+tata2_parent_manifest_12label_2074_BASELINE.csv
+tata_seed_features_manifest_10label_12469_BASELINE.csv
+human_talk_10label_schema.json
+```
+
+### Audited v0.9 seed build
+
+| Item | Count |
+|---|---:|
+| Original reviewed parent clips | 2,074 |
+| New verified silence parents | 27 |
+| Final v0.9 parents | **2,101** |
+| Reused legacy feature rows | 12,469 |
+| New silence feature rows | 120 |
+| Initial v0.9 feature rows | **12,589** |
+
+The initial v0.9 manifest was saved as:
+
+```text
+human_talk_workspace\tata_v0.9_pipeline\tata_triage_model\feature_cache\metadata\multilabel_features_manifest_v09_FINAL.csv
+```
+
+---
+
+## 4. Original v0.9 TATA triage result
+
+The original v0.9 model used 12,589 one-second segment rows.
+
+| Split | Rows |
+|---|---:|
+| Train | 8,745 |
+| Validation | 1,883 |
+| Test | 1,961 |
+
+Final-exit test result:
+
+| Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---:|---:|---:|---:|---:|
+| **0.8195** | **0.8226** | **0.8226** | **0.6527** | **0.0483** |
+
+This remained approximately level with the earlier v0.6 TATA internal baseline while using a cleaner, audited manifest.
+
+---
+
+## 5. Low-energy recovery audit
+
+The original preprocessing discarded low-energy windows before feature extraction. The v0.9 audit reconstructed candidate windows from the original parent audio using one-second windows and a 0.5-second hop.
+
+| Audit item | Count |
+|---|---:|
+| Original parents scanned | 2,074 |
+| Parent audio resolved | 2,074 |
+| One-second grid windows scanned | 22,391 |
+| Already represented windows | 12,164 |
+| Missing low-energy windows before parent cap | 1,178 |
+| Review candidates retained | **1,018** |
+| High priority | 250 |
+| Medium priority | 90 |
+| Low priority | 678 |
+
+All 1,018 candidates were manually reviewed for `silence_present`:
+
+| Review result | Count |
+|---|---:|
+| Genuine silence | **271** |
+| Low-energy but non-silence | **747** |
+
+One reviewed candidate already existed in the feature manifest and was updated in place. The remaining 1,017 rows were appended.
+
+| Recovery item | Count |
+|---|---:|
+| Existing feature rows | 12,589 |
+| Existing rows updated in place | 1 |
+| Missing reviewed rows appended | 1,017 |
+| Full recovered feature rows | **13,606** |
+| Affected parents | 522 |
+| Parent labels changed from silence 0 to 1 | 0 |
+
+---
+
+## 6. v0.9 low-energy experiments
+
+### Experiment A — full recovered dataset
+
+This run included all 1,018 reviewed low-energy candidates. For recovered rows, `silence_present` came from manual segment review while the other nine labels were inherited from the parent.
+
+| Split | Rows |
+|---|---:|
+| Train | 9,445 |
+| Validation | 2,042 |
+| Test | 2,119 |
+
+| Metric | Score |
+|---|---:|
+| Macro-F1 | 0.8064 |
+| Micro-F1 | 0.8064 |
+| Samples-F1 | 0.7968 |
+| Exact Match | 0.6022 |
+| Hamming Loss | 0.0539 |
+| Silence F1 | **0.7875** |
+
+### Experiment B — recovered silence positives only
+
+This ablation removed all 747 manually reviewed non-silence candidates from train, validation, and test while retaining the 271 confirmed silence candidates.
+
+| Split | Rows |
+|---|---:|
+| Train | 8,938 |
+| Validation | 1,926 |
+| Test | 1,995 |
+
+| Metric | Score |
+|---|---:|
+| Macro-F1 | **0.8199** |
+| Micro-F1 | 0.8120 |
+| Samples-F1 | 0.8075 |
+| Exact Match | 0.6110 |
+| Hamming Loss | 0.0537 |
+| Silence F1 | 0.7355 |
+
+### Comparison
+
+| Experiment | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss | Silence F1 |
+|---|---:|---:|---:|---:|---:|---:|
+| Original v0.9 | 0.8195 | **0.8226** | **0.8226** | **0.6527** | **0.0483** | 0.6667 |
+| Full recovery | 0.8064 | 0.8064 | 0.7968 | 0.6022 | 0.0539 | **0.7875** |
+| Silence-positive only | **0.8199** | 0.8120 | 0.8075 | 0.6110 | 0.0537 | 0.7355 |
+
+### Interpretation
+
+The experiment shows that recovering low-energy signals is useful because `silence_present` improved substantially. However, inheriting the other nine parent labels onto one-second recovered windows introduces uncertain supervision.
+
+The 747 non-silence clips should not be deleted permanently. They are valuable hard negatives showing that low energy does not always mean silence. Their other nine labels must be manually reviewed or masked during training.
+
+---
+
+## 7. Current manual-review protocol
+
+`review_silence_present` is already trusted human ground truth for all 1,018 recovered clips.
+
+The other nine labels use tri-state annotation:
+
+```text
+ 1 = confidently present
+ 0 = confidently absent
+-1 = reviewed but uncertain / unknown
+blank = not reviewed yet
+```
+
+Multiple labels may be `1` for the same one-second clip.
+
+If the whole clip is unclear, set all **nine new review labels** to `-1`; do not change the already verified silence label.
+
+For future training:
+
+```text
+known label (0 or 1) -> loss mask = 1
+unknown label (-1)   -> loss mask = 0
+```
+
+The review CSV is generated as:
+
+```text
+human_talk_workspace\tata_v0.9_pipeline\tata_triage_model\manual_review\low_energy_recovery_v09\low_energy_9label_manual_review_v09.csv
+```
+
+---
+
+## 8. Current reporting decisions
+
+| Role | Recommended result |
+|---|---|
+| Official v0.8 main-model parent-level result | Parent mean, fixed 0.5, Exit 3 |
+| v0.8 aggregation research finding | Label-aware mean/max |
+| General v0.9 TATA ten-label baseline | Original v0.9 model |
+| Silence-focused diagnostic | Full low-energy recovery model |
+| Recovery ablation | Silence-positive-only model |
+| Final v0.9 target | Fully reviewed or masked nine-label recovered dataset |
+
+The full-recovery and positive-only results are research ablations. Neither should replace the original v0.9 general ten-label baseline until the nine uncertain labels have been manually reviewed or handled with masked loss.
+
+---
+
+## 9. Documentation map
+
+```text
+docs/DOC_STRUCTURE.md
+docs/README.md
 docs/APPENDIX.md
 docs/MULTILABEL_EXPERIMENT_LOG.md
+docs/COMMANDS_V08.md
+docs/COMMANDS_V09.md
 ```
-=======
-Only the reviewed safe subsets were included in this v0.8-HCB experiment. The large 2,471-row changed-label queue remains a future ablation queue and was not blindly trusted.
 
-### Manifest and balance summary
-
-| item                                        |   count |
-|:--------------------------------------------|--------:|
-| seed_segment_rows                           |   12469 |
-| raw_expanded_segment_rows                   |   23780 |
-| final_combined_segment_rows                 |   36249 |
-| raw_parent_labels_used                      |    4756 |
-| zero_active_corrected_needs_review_excluded |       0 |
-| missing_parent_segment_groups               |       0 |
-
-| label                     |   before_balance |   after_balance |
-|:--------------------------|-----------------:|----------------:|
-| Brene_Brown               |             2885 |            2885 |
-| Eckhart_Tolle             |             3145 |            3145 |
-| Eric_Thomas               |             2850 |            2850 |
-| Gary_Vee                  |             3135 |            3135 |
-| Jay_Shetty                |             4225 |            4225 |
-| Nick_Vujicic              |             2425 |            2425 |
-| other_speaker_present     |            15916 |            9030 |
-| music_present             |            13045 |           11393 |
-| audience_reaction_present |             5124 |            5124 |
-| silence_present           |             1724 |            1724 |
-
-Balancing reduced the heavy `other_speaker_present` dominance while preserving all target-speaker, audience, silence, and seed rows.
-
-## Training settings
-
-| Setting                             | Value                                                                                                                                                        |
-|:------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| branch                              | agentic_data_preprocessing_v0.8                                                                                                                              |
-| experiment                          | v0.8-human-corrected-balanced                                                                                                                                |
-| run_name                            | main_v08_human_corrected_balanced_3exit                                                                                                                      |
-| manifest                            | human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline\final_expanded_training_dataset_balanced\metadata\multilabel_features_manifest_balanced.csv |
-| features_root                       | .                                                                                                                                                            |
-| tap_blocks                          | 1,3                                                                                                                                                          |
-| epochs                              | 40                                                                                                                                                           |
-| batch_size                          | 64                                                                                                                                                           |
-| learning_rate                       | 0.001                                                                                                                                                        |
-| threshold                           | 0.5                                                                                                                                                          |
-| device                              | cpu                                                                                                                                                          |
-| use_pos_weight                      | False                                                                                                                                                        |
-| loss_weights                        | [0.3, 0.3, 1.0]                                                                                                                                              |
-| best_epoch                          | 39                                                                                                                                                           |
-| best_validation_final_exit_macro_f1 | 0.8105259060931592                                                                                                                                           |
-
-## Internal test result
-
-|   exit |   macro_f1 |   micro_f1 |   samples_f1 |   exact_match |   hamming_loss |   avg_true_labels |   avg_pred_labels |
-|-------:|-----------:|-----------:|-------------:|--------------:|---------------:|------------------:|------------------:|
-|      1 |     0.2185 |     0.358  |       0.2833 |        0.1535 |         0.1293 |            1.4493 |            0.565  |
-|      2 |     0.6713 |     0.6837 |       0.6478 |        0.4472 |         0.0844 |            1.4493 |            1.2208 |
-|      3 |     0.8305 |     0.8283 |       0.8285 |        0.6206 |         0.0502 |            1.4493 |            1.4737 |
-
-## Corrected holdout result
-
-### Fixed threshold 0.5, parent mean
-
-| model           | threshold_mode   | aggregation   |   exit |   macro_f1 |   micro_f1 |   samples_f1 |   exact_match |   hamming_loss |   jaccard_score |   avg_true_labels |   avg_pred_labels |
-|:----------------|:-----------------|:--------------|-------:|-----------:|-----------:|-------------:|--------------:|---------------:|----------------:|------------------:|------------------:|
-| v0.8-HCB 3-exit | fixed_0p5        | mean          |      1 |     0.113  |     0.3166 |       0.204  |        0.0288 |         0.1275 |          0.1596 |            1.4694 |            0.3956 |
-| v0.8-HCB 3-exit | fixed_0p5        | mean          |      2 |     0.6315 |     0.7739 |       0.7197 |        0.5467 |         0.0591 |          0.6752 |            1.4694 |            1.1419 |
-| v0.8-HCB 3-exit | fixed_0p5        | mean          |      3 |     0.7801 |     0.9332 |       0.9406 |        0.8397 |         0.0194 |          0.9174 |            1.4694 |            1.4302 |
-
-### Tuned thresholds, parent mean
-
-| model           | threshold_mode   | aggregation   |   exit |   macro_f1 |   micro_f1 |   samples_f1 |   exact_match |   hamming_loss |   jaccard_score |   avg_true_labels |   avg_pred_labels |
-|:----------------|:-----------------|:--------------|-------:|-----------:|-----------:|-------------:|--------------:|---------------:|----------------:|------------------:|------------------:|
-| v0.8-HCB 3-exit | tuned_per_exit   | mean          |      1 |     0.3756 |     0.5239 |       0.547  |        0.1546 |         0.2146 |          0.4356 |            1.4694 |            3.0392 |
-| v0.8-HCB 3-exit | tuned_per_exit   | mean          |      2 |     0.7134 |     0.8107 |       0.8328 |        0.5409 |         0.0597 |          0.7671 |            1.4694 |            1.6863 |
-| v0.8-HCB 3-exit | tuned_per_exit   | mean          |      3 |     0.7487 |     0.9139 |       0.921  |        0.8143 |         0.0243 |          0.8955 |            1.4694 |            1.3576 |
-
-Fixed 0.5 is the final recommended setting. Threshold tuning improved internal validation/test Macro-F1 slightly, but it reduced corrected-holdout parent-level Macro-F1, Micro-F1, Samples-F1, Exact Match, and Hamming Loss.
-
-## Figures
-
-- ![Average true vs predicted labels](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_avg_true_vs_pred_labels_bar.png)
-
-- ![Corrected holdout by exit](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_corrected_holdout_fixed_by_exit_lineplot.png)
-
-- ![Per-label corrected holdout F1](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_corrected_holdout_per_label_f1_bar.png)
-
-- ![Aggregation hamming loss](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_aggregation_hamming_loss_lineplot.png)
-
-- ![Aggregation strategy comparison](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_aggregation_strategy_lineplot.png)
-
-- ![HCB macro hamming tradeoff](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_macro_hamming_tradeoff_bar.png)
-
-- ![HCB per Label mean vs labelaware](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_per_label_mean_vs_labelaware_bar.png)
-
-- ![v0.8 hcb vs v0.6 label aware](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_vs_v06_label_aware_lineplot.png)
-
-- ![Weak transient label F1](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_hcb_weak_label_f1_lineplot.png)
-
-- ![Internal test by exit](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_internal_test_by_exit_lineplot.png)
-
-- ![Label balance plot](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_label_counts_before_after_balance.png)
-
-- ![Training loss and hamming curve](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_training_loss_hamming_curve.png)
-
-- ![Training validation curve](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_training_validation_curve.png)
-
-- ![v0.8 vs v0.6 corrected holdout bar](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_vs_v06_corrected_holdout_bar.png)
-
-- ![v0.8 vs v0.6 hamming loss](docs/figures/human_talk/agentic_data_preprocessing_v0.8/v08_vs_v06_hamming_loss_bar.png)
-
-## Documentation map
-
-- `docs/reports/V08_HUMAN_CORRECTED_BALANCED_EXPERIMENT_REPORT.md` — thesis-ready detailed report.
-- `docs/results/V08_RESULTS_SUMMARY.md` — compact results and comparison tables.
-- `docs/COMMANDS_V08.md` — full PowerShell command log and purpose.
-- `docs/APPENDIX.md` — expanded methodology appendix.
-- `docs/MULTILABEL_EXPERIMENT_LOG.md` — chronological experiment log.
-- `docs/tables/` — CSV source tables used in the docs.
-- `docs/figures/` — generated line/bar plots.
-
-## Key conclusion
-
-v0.8-HCB is the current strongest model and should replace the old v0.6 headline as the main ASHADIP/TATA-assisted preprocessing result. The fair corrected-holdout comparison shows that v0.8-HCB improves global reliability and produces a more realistic number of predicted labels per clip. Remaining work should focus on rare event labels, especially `audience_reaction_present` and `silence_present` on corrected holdout.
->>>>>>> 95dd741cfaaf9a26e581cf7c7b8b89789694ae3e
+`COMMANDS_V09.md` contains the reproducible PowerShell command history and the purpose of each command.

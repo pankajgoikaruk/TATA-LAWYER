@@ -1,0 +1,30 @@
+MAIN MODEL TRAINING MANIFEST LINEAGE
+====================================
+
+Final balanced manifest used for train/val/test:
+human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline\final_expanded_training_dataset_balanced\metadata\multilabel_features_manifest_balanced.csv
+
+Direct parent manifest before balancing:
+human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline\final_expanded_training_dataset\metadata\multilabel_features_manifest.csv
+
+Balancing script:
+scripts\create_v08_balanced_training_manifest.py
+
+Label schema:
+configs\human_talk_10label_schema.json
+
+LAWYER config:
+configs\lawyer_v08_human_talk.json
+
+Important corrected / reviewed input folders:
+human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline\corrected_training_inputs\
+human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline\corrected_holdout\
+
+Important feature sources:
+human_talk_workspace\tata_v0.6_raw_pipeline\raw_pseudo_pool_feature_cache\metadata\multilabel_features_manifest.csv
+human_talk_workspace\tata_v0.6_raw_pipeline\raw_pseudo_pool_feature_cache\features\
+human_talk_workspace\tata_v0.6_raw_pipeline\final_holdout_feature_cache\metadata\multilabel_features_manifest.csv
+human_talk_workspace\tata_v0.6_raw_pipeline\final_holdout_feature_cache\features\
+
+Final holdout corrected manifest:
+human_talk_workspace\tata_v0.8_human_corrected_balanced_pipeline\corrected_holdout\multilabel_features_manifest_CORRECTED_LABELS.csv

@@ -1,0 +1,31 @@
+# TATA-LAWYER v0.8-HCB Data Lineage Tree
+
+Raw dataset:
+human_talk_tata_seed_dataset/
+
+Main trusted workspace:
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/
+
+Main model train/val/test manifest:
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/final_expanded_training_dataset_balanced/metadata/multilabel_features_manifest_balanced.csv
+
+Direct parent before balancing:
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/final_expanded_training_dataset/metadata/multilabel_features_manifest.csv
+
+Corrected training inputs:
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/corrected_training_inputs/
+
+Corrected holdout:
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/corrected_holdout/
+
+v0.6 raw pseudo-pool features:
+human_talk_workspace/tata_v0.6_raw_pipeline/raw_pseudo_pool_feature_cache/
+
+v0.6 final holdout features:
+human_talk_workspace/tata_v0.6_raw_pipeline/final_holdout_feature_cache/
+
+Trained model:
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/main_models/runs/main_v08_human_corrected_balanced_3exit_20260610_084027/
+
+Evaluation outputs:
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/evaluation/
