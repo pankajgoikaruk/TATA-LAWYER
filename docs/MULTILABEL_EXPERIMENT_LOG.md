@@ -352,3 +352,134 @@ Evaluation decision:
 - evaluate recovered low-energy rows separately for silence;
 - use masked metrics for partially labelled rows;
 - do not calculate ordinary Exact Match on rows containing unknown labels.
+
+
+---
+
+## v0.10 — Human-reviewed masked low-energy manifest and fixed-threshold experiment
+
+### Motivation
+
+The v0.9 full-recovery experiment showed that low-energy recovery improved `silence_present`, but parent-inherited labels were unsafe for one-second recovered clips. The positive-only ablation further showed that removing the 747 low-energy non-silence examples restored many global metrics but reduced silence performance. Therefore, v0.10 introduced a human-reviewed tri-state annotation and mask-aware training procedure.
+
+### Manual-review decision
+
+All 1,018 recovered low-energy clips were reviewed for all nine non-silence labels using:
+
+```text
+1  = confidently present
+0  = confidently absent
+-1 = reviewed but uncertain / unknown
+```
+
+The already reviewed `review_silence_present` remained a final 0/1 label. A `previous_review_silence_present` column preserved first-pass silence decisions.
+
+Final review summary:
+
+```text
+Reviewed rows:                 1,018
+Fully known reviewed rows:       966
+Partially known reviewed rows:    52
+Final silence positives:         277
+Final silence negatives:         741
+Silence revisions 0->1:           44
+Silence revisions 1->0:           39
+```
+
+### Masked-manifest build
+
+Command:
+
+```powershell
+python scripts\build_v09_human_reviewed_masked_manifest.py `
+  --source_manifest "$SourceManifest" `
+  --review_csv "$ReviewCsv" `
+  --output_manifest "$MaskedManifest" `
+  --reports_dir "$ReportsDir" `
+  --overwrite
+```
+
+Output:
+
+```text
+Source rows:                   13,606
+Output rows:                   13,606
+Reviewed rows matched:          1,018
+Fully known reviewed rows:        966
+Partially known reviewed rows:      52
+Strict checkpoint val rows:      1,883
+Strict standard test rows:       1,961
+Candidate-ID matches:            1,018
+Fallback segment matches:            0
+```
+
+### Training setting
+
+```text
+Model:          TinyAudioCNN + ExitNet
+Exits:          3
+tap_blocks:     1,3
+loss_weights:   0.3,0.3,1.0
+epochs:         40
+batch_size:     64
+lr:             0.001
+threshold:      0.5
+seed:           42
+device:         CPU
+```
+
+Training data:
+
+```text
+train: 9,445
+val_strict: 1,883
+test_strict: 1,961
+val_all_masked: 2,042
+test_all_masked: 2,119
+val_recovered_masked: 159
+test_recovered_masked: 158
+```
+
+Checkpoint:
+
+```text
+Best epoch: 38
+Best strict validation Macro-F1: 0.7771
+```
+
+### Strict original-test result
+
+| Model | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---|---:|---:|---:|---:|---:|
+| Original v0.9 | **0.8195** | **0.8226** | **0.8226** | **0.6527** | **0.0483** |
+| v0.10 masked strict | 0.7950 | 0.7952 | 0.7655 | 0.5926 | 0.0552 |
+| Delta | -0.0245 | -0.0274 | -0.0571 | -0.0601 | +0.0069 worse |
+
+### Per-label strict-test comparison
+
+| Label | Original v0.9 F1 | v0.10 masked F1 | Delta |
+|---|---:|---:|---:|
+| Brene_Brown | 0.8393 | 0.8317 | -0.0076 |
+| Eckhart_Tolle | 0.9191 | 0.9206 | +0.0015 |
+| Eric_Thomas | 0.8458 | 0.7769 | -0.0689 |
+| Gary_Vee | 0.8927 | 0.8025 | -0.0902 |
+| Jay_Shetty | 0.8845 | 0.8696 | -0.0149 |
+| Nick_Vujicic | 0.7799 | 0.7933 | +0.0134 |
+| other_speaker_present | 0.6253 | 0.6454 | +0.0201 |
+| music_present | 0.8420 | 0.8774 | +0.0354 |
+| audience_reaction_present | 0.8993 | 0.7783 | -0.1210 |
+| silence_present | 0.6667 | 0.6542 | -0.0125 |
+
+### Secondary evaluations
+
+| Subset | Rows | Macro-F1 | Micro-F1 | Samples-F1 | Exact/Fully Known | Hamming |
+|---|---:|---:|---:|---:|---:|---:|
+| test_strict | 1,961 | 0.7950 | 0.7952 | 0.7655 | 0.5926 | 0.0552 |
+| test_all_masked | 2,119 | 0.7991 | 0.7958 | 0.7624 | 0.5988 | 0.0539 |
+| test_recovered_masked | 158 | 0.5095 | 0.8065 | 0.7236 | 0.6828 | 0.0384 |
+
+### Interpretation
+
+The v0.10 manifest is the cleanest annotation artifact so far, but fixed-threshold performance on the original strict test set decreased. The model became conservative: several labels had high precision but low recall. This particularly affected `audience_reaction_present`, `Gary_Vee`, and `Eric_Thomas`.
+
+The next experiment should tune one threshold per label on the strict original validation set, then evaluate once on the strict original test set. Original v0.9 should also be evaluated on the same 158 recovered human-reviewed test rows to establish whether v0.10 improves the low-energy domain.

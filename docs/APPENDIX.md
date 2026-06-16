@@ -378,3 +378,138 @@ For rigorous reporting:
 6. Use the original trusted validation rows for full-label checkpoint selection until recovered validation labels are fully reviewed.
 
 The v0.8 parent-level main-model metrics and v0.9 segment-level TATA metrics must remain separate in all tables and thesis claims.
+
+
+---
+
+## AA. v0.10 human-reviewed masked low-energy experiment
+
+### AA.1 Rationale
+
+The v0.9 low-energy recovery experiments showed that the legacy RMS filtering stage removed meaningful low-energy windows before feature extraction. Recovering these windows improved silence recognition, but parent-inherited labels introduced noisy supervision at one-second resolution. The v0.10 experiment therefore replaces inherited labels for recovered windows with human-reviewed segment-level labels and masks uncertain annotations.
+
+### AA.2 Tri-state annotation
+
+Recovered low-energy clips were reviewed using:
+
+```text
+1  = confidently present
+0  = confidently absent
+-1 = reviewed but uncertain / unknown
+```
+
+The silence label was handled separately because it had already been reviewed and later corrected after second-pass listening.
+
+Final annotation counts:
+
+```text
+Reviewed low-energy rows:      1,018
+Fully known rows:                966
+Partially known rows:             52
+Silence positives:               277
+Silence negatives:               741
+```
+
+### AA.3 Masked loss
+
+For each label, v0.10 converts review values into a binary target and binary supervision mask:
+
+```text
+review = 1  -> target = 1, mask = 1
+review = 0  -> target = 0, mask = 1
+review = -1 -> target = 0, mask = 0
+```
+
+The zero target for unknown labels is a placeholder only. It contributes nothing to the loss because its mask is zero.
+
+For each exit head:
+
+```python
+loss_k = sum(BCEWithLogits(logits_k, y) * mask) / max(sum(mask), 1)
+```
+
+The total three-exit loss is:
+
+```python
+loss = 0.3 * loss_exit1 + 0.3 * loss_exit2 + 1.0 * loss_exit3
+```
+
+### AA.4 Strict and masked evaluation
+
+v0.10 separates evaluation into three subsets:
+
+```text
+test_strict:
+  original 1,961 test rows only
+
+test_all_masked:
+  original + recovered test rows with unknown labels masked
+
+test_recovered_masked:
+  recovered manually reviewed low-energy test rows only
+```
+
+This design protects direct comparability with original v0.9 while still allowing low-energy-domain analysis.
+
+### AA.5 Result
+
+The v0.10 fixed-threshold model was selected by strict validation Macro-F1:
+
+```text
+Best epoch: 38
+Best strict validation Macro-F1: 0.7771
+```
+
+Strict original-test result:
+
+| Metric | Original v0.9 | v0.10 masked | Delta |
+|---|---:|---:|---:|
+| Macro-F1 | 0.8195 | 0.7950 | -0.0245 |
+| Micro-F1 | 0.8226 | 0.7952 | -0.0274 |
+| Samples-F1 | 0.8226 | 0.7655 | -0.0571 |
+| Exact Match | 0.6527 | 0.5926 | -0.0601 |
+| Hamming Loss | 0.0483 | 0.0552 | +0.0069 worse |
+
+The result indicates that cleaner partial-label supervision did not automatically improve the fixed-threshold classifier.
+
+### AA.6 Label-specific behaviour
+
+The v0.10 model improved:
+
+```text
+music_present
+other_speaker_present
+Nick_Vujicic
+Eckhart_Tolle
+```
+
+It decreased substantially on:
+
+```text
+audience_reaction_present
+Gary_Vee
+Eric_Thomas
+```
+
+The dropped labels showed high precision but low recall. This indicates that the corrected negative labels made the model more conservative. The problem is likely not data corruption; it is a threshold/calibration issue introduced by cleaner but more imbalanced supervision.
+
+### AA.7 Research interpretation
+
+v0.10 should be reported as a data-quality and methodology contribution rather than as the current best fixed-threshold TATA model. Its main contribution is that it proves how to safely integrate uncertain human-reviewed low-energy examples through masks.
+
+The official current segment-level TATA baseline remains original v0.9 until either:
+
+1. per-label threshold tuning improves v0.10 strict-test performance; or
+2. a balanced/masked model outperforms original v0.9 under the same strict evaluation.
+
+### AA.8 Next thesis experiment
+
+The next required experiment is per-label threshold calibration:
+
+1. Use the strict original validation set only.
+2. Sweep a threshold per label.
+3. Select thresholds that maximise validation F1 or a controlled macro objective.
+4. Evaluate once on the strict original test set.
+5. Report recovered-only masked performance separately.
+
+This is necessary because the fixed 0.5 threshold appears too conservative for several positive classes after human-reviewed negative correction.
