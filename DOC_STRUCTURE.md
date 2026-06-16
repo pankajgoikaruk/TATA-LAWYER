@@ -230,3 +230,100 @@ low_energy_9label_manual_review_v09.csv
 5. Keep parent-level main-model results separate from one-second TATA results.
 6. Use `-1` only for manually reviewed but uncertain labels; blank means not reviewed.
 7. Store all exact v0.9 PowerShell commands in `docs/COMMANDS_V09.md`.
+
+
+---
+
+## 6. v0.10 human-reviewed masked TATA documentation
+
+### Purpose
+
+v0.10 documents the final low-energy human-review integration after the v0.9 diagnostic experiments. It should be treated as a separate, non-destructive experimental track because it introduces tri-state labels, per-label masks, and masked BCE.
+
+### Recommended reports
+
+```text
+docs/reports/human_talk/V10_HUMAN_REVIEWED_MASKED_LOW_ENERGY_REPORT.md
+```
+
+### Recommended results summary
+
+```text
+docs/results/human_talk/V10_RESULTS_SUMMARY.md
+```
+
+### Recommended tables
+
+```text
+docs/tables/agentic_data_preprocessing_v0.10/
+```
+
+Suggested files:
+
+```text
+v10_masked_manifest_summary.csv
+v10_masked_reviewed_label_summary.csv
+v10_masked_review_match_audit.csv
+v10_original_vs_masked_strict_metrics.csv
+v10_strict_per_label_original_vs_masked.csv
+v10_test_strict_all_recovered_metrics.csv
+v10_threshold_tuning_strict_validation.csv
+v10_original_vs_masked_recovered_test.csv
+v10_unknown_label_counts.csv
+v10_silence_revision_summary.csv
+```
+
+### Recommended figures
+
+```text
+docs/figures/human_talk/agentic_data_preprocessing_v0.10/
+```
+
+Suggested files:
+
+```text
+v10_original_vs_masked_strict_metrics.png
+v10_strict_per_label_f1_delta.png
+v10_precision_recall_shift_by_label.png
+v10_strict_vs_recovered_test_metrics.png
+v10_masked_validation_curve.png
+v10_unknown_label_counts_bar.png
+v10_silence_revision_counts_bar.png
+```
+
+### Canonical v0.10 files
+
+```text
+# Manual tri-state review
+tata_triage_model/manual_review/low_energy_recovery_v09/
+low_energy_9label_manual_review_v09.csv
+
+# Masked manifest
+tata_triage_model/silence_recovered_v09/human_reviewed_masked_v09/
+feature_cache/metadata/multilabel_features_manifest_v09_HUMAN_REVIEWED_MASKED.csv
+
+# Masked manifest reports
+tata_triage_model/silence_recovered_v09/human_reviewed_masked_v09/reports/
+v09_masked_manifest_summary.json
+v09_masked_reviewed_label_summary.csv
+v09_masked_review_match_audit.csv
+
+# Masked training run root
+tata_triage_model/silence_recovered_v09/human_reviewed_masked_v09/runs/
+```
+
+### v0.10 result role
+
+| Result | Status | Purpose |
+|---|---|---|
+| v0.10 human-reviewed masked manifest | Canonical cleaned low-energy annotation artifact | Replaces parent-inherited labels for recovered windows and masks uncertain labels. |
+| v0.10 masked fixed-threshold model | Diagnostic/current result | Scientifically cleaner but lower strict fixed-threshold performance than original v0.9. |
+| v0.10 threshold-tuned model | Next planned experiment | Tests whether conservative predictions can be corrected by label-specific thresholds. |
+
+### Updated preservation rules
+
+8. Do not overwrite `multilabel_features_manifest_v09_SILENCE_RECOVERED.csv`; v0.10 must write a separate masked manifest.
+9. Unknown labels must be represented with `mask_<label> = 0`, not by forcing the target to negative supervision.
+10. Checkpoint selection for v0.10 must use the strict original validation subset unless explicitly running a separate ablation.
+11. The strict original test subset remains the main fair comparison to original v0.9.
+12. Recovered human-reviewed test rows should be reported as a separate low-energy-domain evaluation.

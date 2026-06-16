@@ -1,11 +1,12 @@
 # NeuroAccuExit-ASHADIP Human-Talk Pipeline
 
-This repository contains the TATA-assisted human-talk preprocessing and multi-label early-exit experiments used by the NeuroAccuExit-ASHADIP project.
+This repository contains the TATA-assisted human-talk preprocessing, low-energy recovery, manual review, and multi-label early-exit experiments used by the NeuroAccuExit-ASHADIP project.
 
-The documentation currently distinguishes two separate experimental tracks:
+The documentation now distinguishes three experimental tracks:
 
 1. **v0.8 human-corrected-balanced main model** — evaluated at parent level on the corrected final holdout.
-2. **v0.9 TATA triage model** — rebuilt from the audited seed data and extended with low-energy silence recovery experiments.
+2. **v0.9 TATA triage model** — audited seed reconstruction plus low-energy recovery ablations.
+3. **v0.10 human-reviewed masked TATA triage model** — final low-energy review integration using tri-state labels and masked BCE.
 
 These tracks must not be compared as if they used the same model, prediction level, or evaluation set.
 
@@ -28,7 +29,7 @@ audience_reaction_present
 silence_present
 ```
 
-Overlapping labels are valid. A one-second segment may contain a target speaker, another speaker, music, and audience reaction simultaneously.
+Overlapping labels are valid. A one-second segment may contain a target speaker, another speaker, music, audience reaction, and a meaningful silence/near-silence portion.
 
 ---
 
@@ -63,9 +64,9 @@ The earlier 93–94% Samples-F1 and 82–84% Exact Match values belong to this *
 
 ---
 
-## 3. v0.9 workspace and data lineage
+## 3. v0.9/v0.10 workspace and data lineage
 
-The v0.9 workspace separates the TATA triage model from the downstream NeuroAccuExit main model:
+The workspace separates the TATA triage model from the downstream NeuroAccuExit main model:
 
 ```text
 human_talk_workspace/
@@ -76,6 +77,7 @@ human_talk_workspace/
     │   ├── runs/
     │   ├── manual_review/
     │   └── silence_recovered_v09/
+    │       └── human_reviewed_masked_v09/
     ├── neuroaccuexit_main_model/
     └── shared/
 ```
@@ -101,7 +103,7 @@ human_talk_10label_schema.json
 | New silence feature rows | 120 |
 | Initial v0.9 feature rows | **12,589** |
 
-The initial v0.9 manifest was saved as:
+Initial v0.9 manifest:
 
 ```text
 human_talk_workspace\tata_v0.9_pipeline\tata_triage_model\feature_cache\metadata\multilabel_features_manifest_v09_FINAL.csv
@@ -145,7 +147,7 @@ The original preprocessing discarded low-energy windows before feature extractio
 | Medium priority | 90 |
 | Low priority | 678 |
 
-All 1,018 candidates were manually reviewed for `silence_present`:
+First-pass silence review:
 
 | Review result | Count |
 |---|---:|
@@ -162,6 +164,20 @@ One reviewed candidate already existed in the feature manifest and was updated i
 | Full recovered feature rows | **13,606** |
 | Affected parents | 522 |
 | Parent labels changed from silence 0 to 1 | 0 |
+
+Recovered manifest:
+
+```text
+human_talk_workspace\tata_v0.9_pipeline\tata_triage_model\silence_recovered_v09\feature_cache\metadata\multilabel_features_manifest_v09_SILENCE_RECOVERED.csv
+```
+
+Recovered features root:
+
+```text
+human_talk_workspace\tata_v0.9_pipeline\tata_triage_model\silence_recovered_v09\feature_cache\features
+```
+
+No later feature re-extraction was required because v0.10 changed annotations and masks, not the audio clips or `.npy` feature arrays.
 
 ---
 
@@ -213,19 +229,24 @@ This ablation removed all 747 manually reviewed non-silence candidates from trai
 | Full recovery | 0.8064 | 0.8064 | 0.7968 | 0.6022 | 0.0539 | **0.7875** |
 | Silence-positive only | **0.8199** | 0.8120 | 0.8075 | 0.6110 | 0.0537 | 0.7355 |
 
-### Interpretation
+Interpretation:
 
-The experiment shows that recovering low-energy signals is useful because `silence_present` improved substantially. However, inheriting the other nine parent labels onto one-second recovered windows introduces uncertain supervision.
-
-The 747 non-silence clips should not be deleted permanently. They are valuable hard negatives showing that low energy does not always mean silence. Their other nine labels must be manually reviewed or masked during training.
+- Recovering low-energy signals is useful because `silence_present` improved substantially.
+- Inheriting the other nine parent labels onto one-second recovered windows introduces uncertain or incorrect supervision.
+- The 747 non-silence clips should not be deleted permanently; they are valuable hard negatives showing that low energy does not always mean silence.
 
 ---
 
-## 7. Current manual-review protocol
+## 7. v0.10 human-reviewed tri-state protocol
 
-`review_silence_present` is already trusted human ground truth for all 1,018 recovered clips.
+`review_silence_present` was rechecked and became final human ground truth for all 1,018 recovered clips. The user corrected both directions:
 
-The other nine labels use tri-state annotation:
+```text
+0 -> 1 when silence was missed
+1 -> 0 when a clip was not actually silence
+```
+
+The other nine labels were manually reviewed with tri-state annotation:
 
 ```text
  1 = confidently present
@@ -238,45 +259,219 @@ Multiple labels may be `1` for the same one-second clip.
 
 If the whole clip is unclear, set all **nine new review labels** to `-1`; do not change the already verified silence label.
 
-For future training:
+For training:
 
 ```text
 known label (0 or 1) -> loss mask = 1
 unknown label (-1)   -> loss mask = 0
 ```
 
-The review CSV is generated as:
+Manual review CSV:
 
 ```text
 human_talk_workspace\tata_v0.9_pipeline\tata_triage_model\manual_review\low_energy_recovery_v09\low_energy_9label_manual_review_v09.csv
 ```
 
+Final review state before v0.10 manifest build:
+
+| Item | Count |
+|---|---:|
+| Reviewed low-energy rows | 1,018 |
+| Fully known reviewed rows | 966 |
+| Partially known reviewed rows | 52 |
+| Rows with all nine labels unknown | 0 |
+| Final silence positives | 277 |
+| Final silence negatives | 741 |
+| Silence revisions 0→1 | 44 |
+| Silence revisions 1→0 | 39 |
+
 ---
 
-## 8. Current reporting decisions
+## 8. v0.10 masked manifest
+
+The v0.10 manifest builder matched all 1,018 reviewed rows by candidate ID and produced a non-destructive masked feature manifest.
+
+Builder output:
+
+| Item | Count |
+|---|---:|
+| Source rows | 13,606 |
+| Output rows | 13,606 |
+| Reviewed rows matched | 1,018 |
+| Fully known reviewed rows | 966 |
+| Partially known reviewed rows | 52 |
+| Strict checkpoint validation rows | 1,883 |
+| Strict standard test rows | 1,961 |
+| Candidate-ID matches | 1,018 |
+| Fallback segment matches | 0 |
+
+Masked manifest:
+
+```text
+human_talk_workspace\tata_v0.9_pipeline\tata_triage_model\silence_recovered_v09\human_reviewed_masked_v09\feature_cache\metadata\multilabel_features_manifest_v09_HUMAN_REVIEWED_MASKED.csv
+```
+
+Important new columns:
+
+```text
+mask_Brene_Brown
+mask_Eckhart_Tolle
+mask_Eric_Thomas
+mask_Gary_Vee
+mask_Jay_Shetty
+mask_Nick_Vujicic
+mask_other_speaker_present
+mask_music_present
+mask_audience_reaction_present
+mask_silence_present
+
+v09_masked_review_applied
+v09_review_candidate_id
+v09_review_has_unknown
+v09_review_known_label_count
+v09_review_unknown_label_count
+v09_evaluation_group
+v09_checkpoint_eligible
+v09_standard_test_eligible
+```
+
+Strict evaluation policy:
+
+```text
+Checkpoint selection:
+  original 1,883 validation rows only
+
+Fair main test:
+  original 1,961 test rows only
+
+Secondary reports:
+  all masked test rows
+  recovered human-reviewed test rows
+```
+
+---
+
+## 9. v0.10 masked training result
+
+Training module:
+
+```text
+training.train_multilabel_masked
+```
+
+The model used the same architecture and fixed-threshold settings as v0.9:
+
+```text
+tap_blocks = 1,3
+loss_weights = 0.3,0.3,1.0
+epochs = 40
+batch_size = 64
+lr = 0.001
+seed = 42
+threshold = 0.5
+device = CPU
+```
+
+Training rows:
+
+```text
+train: 9,445
+val_strict: 1,883
+test_strict: 1,961
+val_all_masked: 2,042
+test_all_masked: 2,119
+val_recovered_masked: 159
+test_recovered_masked: 158
+```
+
+Best checkpoint:
+
+```text
+Best epoch: 38
+Best strict validation Macro-F1: 0.7771
+```
+
+### Strict original test result
+
+This is the fair comparison against original v0.9 because it uses the same 1,961 test rows.
+
+| Model | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---|---:|---:|---:|---:|---:|
+| Original v0.9 | **0.8195** | **0.8226** | **0.8226** | **0.6527** | **0.0483** |
+| v0.10 masked strict | 0.7950 | 0.7952 | 0.7655 | 0.5926 | 0.0552 |
+| Change | -0.0245 | -0.0274 | -0.0571 | -0.0601 | +0.0069 worse |
+
+### Strict per-label F1
+
+| Label | Original v0.9 | v0.10 masked strict | Change |
+|---|---:|---:|---:|
+| Brene Brown | 0.8393 | 0.8317 | -0.0076 |
+| Eckhart Tolle | 0.9191 | **0.9206** | +0.0015 |
+| Eric Thomas | **0.8458** | 0.7769 | -0.0689 |
+| Gary Vee | **0.8927** | 0.8025 | -0.0902 |
+| Jay Shetty | 0.8845 | 0.8696 | -0.0149 |
+| Nick Vujicic | 0.7799 | **0.7933** | +0.0134 |
+| Other speaker | 0.6253 | **0.6454** | +0.0201 |
+| Music | 0.8420 | **0.8774** | +0.0354 |
+| Audience reaction | **0.8993** | 0.7783 | -0.1210 |
+| Silence | **0.6667** | 0.6542 | -0.0125 |
+
+### Secondary v0.10 reports
+
+| Evaluation subset | Rows | Macro-F1 | Micro-F1 | Samples-F1 | Exact/Fully Known | Hamming |
+|---|---:|---:|---:|---:|---:|---:|
+| test_strict | 1,961 | 0.7950 | 0.7952 | 0.7655 | 0.5926 | 0.0552 |
+| test_all_masked | 2,119 | 0.7991 | 0.7958 | 0.7624 | 0.5988 | 0.0539 |
+| test_recovered_masked | 158 | 0.5095 | 0.8065 | 0.7236 | 0.6828 | 0.0384 |
+
+Interpretation:
+
+- The masked manifest is technically correct and scientifically cleaner.
+- The fixed-threshold v0.10 model did **not** improve the overall original-test benchmark.
+- It improved `music_present`, `other_speaker_present`, `Nick_Vujicic`, and `Eckhart_Tolle`.
+- It became too conservative for `audience_reaction_present`, `Gary_Vee`, and `Eric_Thomas`.
+- Precision was high and recall was low for several dropped labels, indicating threshold calibration is likely needed.
+- The recovered-only masked test subset shows strong micro-F1 and hamming results, but its macro-F1 is not directly comparable because several labels have low support.
+
+---
+
+## 10. Current reporting decisions
 
 | Role | Recommended result |
 |---|---|
 | Official v0.8 main-model parent-level result | Parent mean, fixed 0.5, Exit 3 |
 | v0.8 aggregation research finding | Label-aware mean/max |
 | General v0.9 TATA ten-label baseline | Original v0.9 model |
-| Silence-focused diagnostic | Full low-energy recovery model |
+| Low-energy diagnostic | Full low-energy recovery model |
 | Recovery ablation | Silence-positive-only model |
-| Final v0.9 target | Fully reviewed or masked nine-label recovered dataset |
+| Current v0.10 data-quality result | Human-reviewed masked manifest |
+| Current v0.10 model result | Scientifically cleaner but lower fixed-threshold strict performance |
+| Immediate next experiment | Per-label threshold tuning on strict validation |
+| Needed missing comparison | Original v0.9 checkpoint evaluated on the same 158 recovered reviewed test clips |
 
-The full-recovery and positive-only results are research ablations. Neither should replace the original v0.9 general ten-label baseline until the nine uncertain labels have been manually reviewed or handled with masked loss.
+The v0.10 masked result should not yet replace original v0.9 as the best general fixed-threshold ten-label TATA baseline. It should be reported as the **cleaner human-reviewed partial-label experiment** and used to motivate threshold calibration and low-energy-domain evaluation.
 
 ---
 
-## 9. Documentation map
+## 11. Important research conclusions
 
-```text
-docs/DOC_STRUCTURE.md
-docs/README.md
-docs/APPENDIX.md
-docs/MULTILABEL_EXPERIMENT_LOG.md
-docs/COMMANDS_V08.md
-docs/COMMANDS_V09.md
-```
+1. The original preprocessing pipeline censored low-energy windows before feature extraction.
+2. Low-energy recovery is scientifically justified because it improved silence recognition in diagnostic experiments.
+3. The 747 non-silence low-energy clips are valuable hard negatives and should not be discarded.
+4. Parent-level labels are unsafe as one-second labels for recovered windows.
+5. Manual segment-level tri-state review corrected inherited-label contamination.
+6. Masked BCE is the correct way to use partially uncertain labels.
+7. Cleaner labels did not automatically improve fixed-threshold model performance.
+8. The v0.10 model became conservative for several labels; threshold tuning is the next required step.
+9. Strict validation/test subsets must stay unchanged for fair comparison.
+10. Recovered clips should be evaluated separately because they represent a harder low-energy domain.
 
-`COMMANDS_V09.md` contains the reproducible PowerShell command history and the purpose of each command.
+---
+
+## 12. Next steps
+
+1. Tune per-label thresholds using only strict original validation rows.
+2. Evaluate those thresholds once on the strict original test rows.
+3. Evaluate original v0.9 and v0.10 masked models on the same 158 recovered human-reviewed test rows.
+4. Add class-balancing or positive-class weighting only after threshold tuning.
+5. Keep all v0.10 files non-destructive and separate from v0.9 baseline files.
