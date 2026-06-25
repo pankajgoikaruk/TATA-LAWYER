@@ -6,7 +6,8 @@ The documentation now distinguishes three experimental tracks:
 
 1. **v0.8 human-corrected-balanced main model** — evaluated at parent level on the corrected final holdout.
 2. **v0.9 TATA triage model** — audited seed reconstruction plus low-energy recovery ablations.
-3. **v0.10 human-reviewed masked TATA triage model** — final low-energy review integration using tri-state labels and masked BCE.
+3. **v0.10 human-reviewed masked TATA triage model** — low-energy review integration using tri-state labels and masked BCE.
+4. **v0.10.1 TATA-LAWYER domain-aware hybrid** — final selected system: original v0.9 for normal audio and masked v0.10 for recovered low-energy audio.
 
 These tracks must not be compared as if they used the same model, prediction level, or evaluation set.
 
@@ -435,43 +436,132 @@ Interpretation:
 
 ---
 
-## 10. Current reporting decisions
+---
+## 10. v0.10.1 final selected system: domain-aware hybrid
 
-| Role | Recommended result |
-|---|---|
-| Official v0.8 main-model parent-level result | Parent mean, fixed 0.5, Exit 3 |
-| v0.8 aggregation research finding | Label-aware mean/max |
-| General v0.9 TATA ten-label baseline | Original v0.9 model |
-| Low-energy diagnostic | Full low-energy recovery model |
-| Recovery ablation | Silence-positive-only model |
-| Current v0.10 data-quality result | Human-reviewed masked manifest |
-| Current v0.10 model result | Scientifically cleaner but lower fixed-threshold strict performance |
-| Immediate next experiment | Per-label threshold tuning on strict validation |
-| Needed missing comparison | Original v0.9 checkpoint evaluated on the same 158 recovered reviewed test clips |
+The v0.10.1 branch documents the final model-selection decision after the masked-training, recovered-domain thresholding, and hybrid-routing experiments.
 
-The v0.10 masked result should not yet replace original v0.9 as the best general fixed-threshold ten-label TATA baseline. It should be reported as the **cleaner human-reviewed partial-label experiment** and used to motivate threshold calibration and low-energy-domain evaluation.
+Final selected system:
+
+```text
+Normal/original audio:
+    model:      Original v0.9 TATA triage checkpoint
+    threshold:  fixed 0.50
+
+Recovered low-energy audio:
+    model:      Human-reviewed masked v0.10 checkpoint
+    threshold:  recovered-domain per-label thresholds
+```
+
+This system is referred to as:
+
+```text
+TATA-LAWYER v0.10.1 Domain-Aware Hybrid
+branch: tata_lawyer_v0.10.1
+```
+
+The branch is a documentation and finalisation release. It does not introduce new feature extraction, new manual review, or a new training run.
+
+### Final combined 2,119-row test comparison
+
+| Policy | Normal/original audio | Recovered low-energy audio | Macro-F1 | Micro-F1 | Samples-F1 | Known-label Exact | Fully-known Exact | Hamming Loss ↓ |
+|---|---|---|---:|---:|---:|---:|---:|---:|
+| Original fixed everywhere | Original v0.9, threshold 0.50 | Original v0.9, threshold 0.50 | 0.8155 | 0.8171 | 0.8108 | 0.6465 | 0.6462 | 0.0489 |
+| Masked fixed everywhere | Masked v0.10, threshold 0.50 | Masked v0.10, threshold 0.50 | 0.7991 | 0.7958 | 0.7624 | 0.5998 | 0.5988 | 0.0539 |
+| Original domain-aware | Original v0.9, normal threshold | Original v0.9, recovered thresholds | 0.8162 | 0.8165 | 0.8092 | 0.6446 | 0.6453 | 0.0491 |
+| Masked domain-aware | Masked v0.10, strict thresholds | Masked v0.10, recovered thresholds | 0.8173 | 0.8081 | 0.7813 | 0.6031 | 0.6030 | 0.0526 |
+| **Hybrid recommended** | **Original v0.9, threshold 0.50** | **Masked v0.10, recovered thresholds** | **0.8224** | **0.8218** | **0.8174** | **0.6555** | **0.6557** | **0.0477** |
+
+Compared with the original fixed-threshold system, the selected hybrid improved every aggregate metric:
+
+| Metric | Original fixed everywhere | v0.10.1 hybrid | Absolute change |
+|---|---:|---:|---:|
+| Macro-F1 | 0.8155 | **0.8224** | **+0.0068** |
+| Micro-F1 | 0.8171 | **0.8218** | **+0.0047** |
+| Samples-F1 | 0.8108 | **0.8174** | **+0.0066** |
+| Known-label Exact | 0.6465 | **0.6555** | **+0.0090** |
+| Fully-known Exact | 0.6462 | **0.6557** | **+0.0095** |
+| Hamming Loss ↓ | 0.0489 | **0.0477** | **-0.0013** |
+
+### Recovered low-energy test comparison
+
+Both checkpoints were evaluated on the same 158 recovered human-reviewed test clips. The original v0.9 checkpoint was also tuned using the same recovered validation clips, so this is the decisive low-energy-domain comparison.
+
+| Model on recovered audio | Threshold source | Macro-F1 | Micro-F1 | Samples-F1 | Fully-known Exact | Hamming Loss ↓ |
+|---|---|---:|---:|---:|---:|---:|
+| Original v0.9 | Fixed 0.50 | 0.4756 | 0.7262 | 0.6646 | 0.5586 | 0.0569 |
+| Masked v0.10 | Fixed 0.50 | 0.5095 | 0.8065 | 0.7236 | 0.6828 | **0.0384** |
+| Original v0.9 | Recovered-domain thresholds | 0.5126 | 0.7143 | 0.6424 | 0.5448 | 0.0589 |
+| **Masked v0.10** | **Recovered-domain thresholds** | **0.5438** | **0.8075** | **0.7532** | **0.6966** | 0.0397 |
+
+This shows that the masked v0.10 checkpoint is the better low-energy specialist. The gain is not only a thresholding artifact because the masked checkpoint also outperformed the original checkpoint at the same fixed threshold of 0.50.
+
+### Final recovered-domain thresholds
+
+```text
+Brene_Brown                0.22
+Eckhart_Tolle              0.50
+Eric_Thomas                0.44
+Gary_Vee                   0.50
+Jay_Shetty                 0.57
+Nick_Vujicic               0.50
+other_speaker_present      0.45
+music_present              0.57
+audience_reaction_present  0.18
+silence_present            0.46
+```
 
 ---
 
-## 11. Important research conclusions
+## 11. Research questions answered by v0.10.1
+
+| Research question | Answer |
+|---|---|
+| Does low-energy recovery matter? | Yes. It exposed missing low-energy evidence and improved silence-related learning in the diagnostic experiments. |
+| Is low energy equivalent to silence? | No. The 741 final silence-negative reviewed clips show that low-energy audio contains important hard negatives. |
+| Are inherited parent-level labels safe for recovered one-second windows? | No. They introduce label noise because a parent-level speaker/music/audience label may not apply to every recovered segment. |
+| Does tri-state human review plus masked BCE solve the supervision problem? | Yes. It integrates known labels while preventing uncertain labels from being treated as false negatives. |
+| Should the masked v0.10 model replace original v0.9 globally? | No. It is not the best universal normal-audio model. |
+| What is the final selected system? | A deterministic domain-aware hybrid: original v0.9 for normal audio and masked v0.10 for recovered low-energy audio. |
+
+---
+
+## 12. Final research findings
 
 1. The original preprocessing pipeline censored low-energy windows before feature extraction.
-2. Low-energy recovery is scientifically justified because it improved silence recognition in diagnostic experiments.
-3. The 747 non-silence low-energy clips are valuable hard negatives and should not be discarded.
-4. Parent-level labels are unsafe as one-second labels for recovered windows.
-5. Manual segment-level tri-state review corrected inherited-label contamination.
-6. Masked BCE is the correct way to use partially uncertain labels.
-7. Cleaner labels did not automatically improve fixed-threshold model performance.
-8. The v0.10 model became conservative for several labels; threshold tuning is the next required step.
-9. Strict validation/test subsets must stay unchanged for fair comparison.
-10. Recovered clips should be evaluated separately because they represent a harder low-energy domain.
+2. Low-energy recovery is scientifically justified, but simple recovery with inherited parent labels is not sufficient.
+3. Manual segment-level tri-state review corrected inherited-label contamination in the recovered low-energy subset.
+4. Masked BCE is the correct training objective for partially known multi-label annotations.
+5. The masked v0.10 model became a useful low-energy specialist rather than the best universal model.
+6. Domain-aware routing produced the strongest combined system across all tested policies.
+7. The selected hybrid improved Macro-F1, Micro-F1, Samples-F1, exact match, and Hamming Loss over the original fixed-threshold baseline.
 
 ---
 
-## 12. Next steps
+## 13. Final reporting decision
 
-1. Tune per-label thresholds using only strict original validation rows.
-2. Evaluate those thresholds once on the strict original test rows.
-3. Evaluate original v0.9 and v0.10 masked models on the same 158 recovered human-reviewed test rows.
-4. Add class-balancing or positive-class weighting only after threshold tuning.
-5. Keep all v0.10 files non-destructive and separate from v0.9 baseline files.
+| Role | Final result |
+|---|---|
+| Official v0.8 main-model parent-level result | Parent mean, fixed 0.5, Exit 3 |
+| v0.8 aggregation research finding | Label-aware mean/max aggregation |
+| General normal-audio TATA baseline | Original v0.9 model with fixed threshold 0.50 |
+| Low-energy specialist | Human-reviewed masked v0.10 model with recovered-domain thresholds |
+| Final TATA-LAWYER v0.10.1 system | Domain-aware hybrid |
+| Branch for final documentation | `tata_lawyer_v0.10.1` |
+
+The v0.10.1 hybrid should now be treated as the final TATA-LAWYER model-selection result. Further work should focus on documentation, reproducibility, routing implementation, and thesis reporting rather than additional training.
+
+---
+
+## 14. Do not restart these steps
+
+Do not restart:
+
+1. manual review;
+2. feature extraction;
+3. masked-manifest building;
+4. masked training;
+5. class weighting or oversampling;
+6. another threshold search on the same final test set.
+
+The modelling question is resolved for the current dataset. A future paper-strength confirmation can use a new untouched low-energy holdout, but that is a separate validation step, not part of v0.10.1 finalisation.

@@ -13,6 +13,7 @@ docs/APPENDIX.md
 docs/MULTILABEL_EXPERIMENT_LOG.md
 docs/COMMANDS_V08.md
 docs/COMMANDS_V09.md
+docs/COMMANDS_V010.md
 ```
 
 | File | Purpose |
@@ -23,6 +24,7 @@ docs/COMMANDS_V09.md
 | `MULTILABEL_EXPERIMENT_LOG.md` | Chronological record of experiments and decisions. |
 | `COMMANDS_V08.md` | Reproducible v0.8 command history. |
 | `COMMANDS_V09.md` | Reproducible v0.9 workspace, review, recovery, training, and ablation commands. |
+| `COMMANDS_V010.md` | Reproducible v0.10 masked-training and v0.10.1 hybrid-finalisation commands. |
 
 ---
 
@@ -317,8 +319,8 @@ tata_triage_model/silence_recovered_v09/human_reviewed_masked_v09/runs/
 | Result | Status | Purpose |
 |---|---|---|
 | v0.10 human-reviewed masked manifest | Canonical cleaned low-energy annotation artifact | Replaces parent-inherited labels for recovered windows and masks uncertain labels. |
-| v0.10 masked fixed-threshold model | Diagnostic/current result | Scientifically cleaner but lower strict fixed-threshold performance than original v0.9. |
-| v0.10 threshold-tuned model | Next planned experiment | Tests whether conservative predictions can be corrected by label-specific thresholds. |
+| v0.10 masked fixed-threshold model | Diagnostic result | Scientifically cleaner but lower strict fixed-threshold performance than original v0.9. |
+| v0.10 recovered-threshold model | Low-energy specialist component | Selected for the recovered low-energy branch in v0.10.1. |
 
 ### Updated preservation rules
 
@@ -327,3 +329,109 @@ tata_triage_model/silence_recovered_v09/human_reviewed_masked_v09/runs/
 10. Checkpoint selection for v0.10 must use the strict original validation subset unless explicitly running a separate ablation.
 11. The strict original test subset remains the main fair comparison to original v0.9.
 12. Recovered human-reviewed test rows should be reported as a separate low-energy-domain evaluation.
+
+---
+## 7. v0.10.1 final domain-aware hybrid documentation
+
+### Purpose
+
+v0.10.1 documents the final model-selection outcome after the v0.10 masked human-reviewed experiment, recovered-domain threshold calibration, and domain-aware hybrid evaluation.
+
+The final system is:
+
+```text
+Normal/original audio:
+    Original v0.9 model
+    Fixed threshold = 0.50
+
+Recovered low-energy audio:
+    Human-reviewed masked v0.10 model
+    Recovered-domain thresholds
+```
+
+Branch name:
+
+```text
+tata_lawyer_v0.10.1
+```
+
+### Recommended final report
+
+```text
+docs/results/human_talk/V10_1_DOMAIN_AWARE_HYBRID_FINAL.md
+```
+
+### Recommended final tables
+
+```text
+docs/tables/agentic_data_preprocessing_v0.10.1/
+```
+
+Suggested files:
+
+```text
+v10_1_final_policy_comparison.csv
+v10_1_original_vs_masked_recovered_test.csv
+v10_1_recovered_domain_thresholds.csv
+v10_1_combined_test_metrics.csv
+v10_1_per_label_original_vs_hybrid.csv
+v10_1_final_artifact_freeze_list.csv
+```
+
+### Recommended final figures
+
+```text
+docs/figures/human_talk/agentic_data_preprocessing_v0.10.1/
+```
+
+Suggested files:
+
+```text
+v10_1_final_policy_comparison_bar.png
+v10_1_recovered_test_original_vs_masked_bar.png
+v10_1_hybrid_vs_original_metric_delta.png
+v10_1_domain_routing_diagram.png
+v10_1_per_label_f1_original_vs_hybrid.png
+```
+
+### Canonical v0.10.1 artifacts
+
+```text
+# Final branch
+tata_lawyer_v0.10.1
+
+# Normal/original-audio model
+tata_triage_model/runs/
+tata_v09_human_corrected_3exit_*
+
+# Low-energy specialist model
+tata_triage_model/silence_recovered_v09/human_reviewed_masked_v09/runs/
+tata_v09_human_reviewed_masked_3exit_20260616_114500
+
+# Masked manifest
+tata_triage_model/silence_recovered_v09/human_reviewed_masked_v09/
+feature_cache/metadata/multilabel_features_manifest_v09_HUMAN_REVIEWED_MASKED.csv
+
+# Threshold profiles
+tata_triage_model/silence_recovered_v09/human_reviewed_masked_v09/runs/
+tata_v09_human_reviewed_masked_3exit_20260616_114500/threshold_profiles/
+```
+
+### v0.10.1 result role
+
+| Result | Status | Purpose |
+|---|---|---|
+| Original v0.9 fixed-threshold model | Final normal-audio branch | Best tested normal/original-audio policy. |
+| Masked v0.10 recovered-threshold model | Final low-energy branch | Best tested recovered low-energy specialist. |
+| v0.10.1 domain-aware hybrid | Final selected TATA-LAWYER policy | Combines the strongest normal-audio and low-energy policies. |
+| Strict-threshold profiles | Diagnostic/ablation | Useful for analysis but not the selected final hybrid. |
+| Additional training with class weights | Deferred | Only for future ablation, not part of v0.10.1. |
+
+### Updated preservation rules
+
+13. Treat `tata_lawyer_v0.10.1` as the final documentation branch for the selected hybrid result.
+14. Keep v0.9 original model artifacts and v0.10 masked artifacts separate; the final system routes between them.
+15. Do not route using labels or test-only metadata at deployment time. Routing must be derived from raw audio energy/preprocessing metadata.
+16. The low-energy branch uses recovered-domain thresholds; the normal branch uses the original v0.9 fixed 0.50 threshold.
+17. Do not claim the recovered thresholds are universally optimal; report them as the best selected thresholds for the recovered low-energy validation/test protocol.
+18. Future confirmation should use a new untouched low-energy holdout if a stronger publication claim is needed.
