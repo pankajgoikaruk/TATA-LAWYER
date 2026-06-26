@@ -2,14 +2,15 @@
 
 This repository contains the TATA-assisted human-talk preprocessing, low-energy recovery, manual review, and multi-label early-exit experiments used by the NeuroAccuExit-ASHADIP project.
 
-The documentation now distinguishes three experimental tracks:
+The documentation now distinguishes five experimental tracks:
 
 1. **v0.8 human-corrected-balanced main model** — evaluated at parent level on the corrected final holdout.
 2. **v0.9 TATA triage model** — audited seed reconstruction plus low-energy recovery ablations.
 3. **v0.10 human-reviewed masked TATA triage model** — low-energy review integration using tri-state labels and masked BCE.
-4. **v0.10.1 TATA-LAWYER domain-aware hybrid** — final selected system: original v0.9 for normal audio and masked v0.10 for recovered low-energy audio.
+4. **v0.10.1 TATA-LAWYER domain-aware hybrid** — final selected weak-label generator: original v0.9 for normal audio and masked v0.10 for recovered low-energy audio.
+5. **Downstream NeuroAccuExit hybrid weak-label model** — trained from the final TATA-LAWYER hybrid weak-label manifest and evaluated on a human context-checked parent-level holdout.
 
-These tracks must not be compared as if they used the same model, prediction level, or evaluation set.
+These tracks must not be compared as if they used the same model, prediction level, training target, or evaluation set.
 
 ---
 
@@ -533,8 +534,10 @@ silence_present            0.46
 3. Manual segment-level tri-state review corrected inherited-label contamination in the recovered low-energy subset.
 4. Masked BCE is the correct training objective for partially known multi-label annotations.
 5. The masked v0.10 model became a useful low-energy specialist rather than the best universal model.
-6. Domain-aware routing produced the strongest combined system across all tested policies.
+6. Domain-aware routing produced the strongest combined TATA-LAWYER weak-label generator across all tested policies.
 7. The selected hybrid improved Macro-F1, Micro-F1, Samples-F1, exact match, and Hamming Loss over the original fixed-threshold baseline.
+8. The downstream NeuroAccuExit model can learn the hybrid weak-label policy, but human context-checked holdout evaluation reveals aggregation mismatch.
+9. Repeated calibration-selected label-wise parent aggregation improves downstream human-holdout F1 metrics compared with global aggregation rules.
 
 ---
 
@@ -546,8 +549,10 @@ silence_present            0.46
 | v0.8 aggregation research finding | Label-aware mean/max aggregation |
 | General normal-audio TATA baseline | Original v0.9 model with fixed threshold 0.50 |
 | Low-energy specialist | Human-reviewed masked v0.10 model with recovered-domain thresholds |
-| Final TATA-LAWYER v0.10.1 system | Domain-aware hybrid |
+| Final TATA-LAWYER v0.10.1 system | Domain-aware hybrid weak-label generator |
+| Downstream NeuroAccuExit confirmed finding | v0.6 repeated calibration-selected label-wise parent aggregation |
 | Branch for final documentation | `tata_lawyer_v0.10.1` |
+| Branch/workspace for downstream work | `neuroaccuexit_hybrid_weaklabels` |
 
 The v0.10.1 hybrid should now be treated as the final TATA-LAWYER model-selection result. Further work should focus on documentation, reproducibility, routing implementation, and thesis reporting rather than additional training.
 
@@ -564,4 +569,161 @@ Do not restart:
 5. class weighting or oversampling;
 6. another threshold search on the same final test set.
 
-The modelling question is resolved for the current dataset. A future paper-strength confirmation can use a new untouched low-energy holdout, but that is a separate validation step, not part of v0.10.1 finalisation.
+The TATA-LAWYER model-selection question is resolved for the current dataset. The downstream NeuroAccuExit v0.6 aggregation finding is also frozen as the confirmed result before optional v0.7 threshold-calibration diagnostics. A future paper-strength confirmation can use a new untouched low-energy holdout, but that is a separate validation step, not part of v0.10.1/v0.6 finalisation.
+
+---
+
+## 15. Downstream NeuroAccuExit hybrid weak-label branch
+
+After the final TATA-LAWYER v0.10.1 system was selected, it was used as a domain-aware weak-label generator for a downstream NeuroAccuExit model.
+
+Workspace:
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/
+```
+
+Final weak-label routing:
+
+| Audio domain | Weak-label source |
+|---|---|
+| Normal/original audio | Original v0.9 TATA model with fixed threshold 0.50 |
+| Recovered low-energy audio | Human-reviewed masked v0.10 model with recovered-domain thresholds |
+
+Final hybrid weak-label manifest:
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/metadata/final_hybrid_weaklabel_manifest.csv
+```
+
+Manifest size:
+
+| Split/domain | Rows |
+|---|---:|
+| train, normal/original | 8,744 |
+| train, recovered low-energy | 701 |
+| val, normal/original | 1,883 |
+| val, recovered low-energy | 159 |
+| test, normal/original | 1,961 |
+| test, recovered low-energy | 158 |
+| **Total** | **13,606** |
+
+Important distinction:
+
+```text
+Weak-label test performance measures how well the downstream model learns the TATA-LAWYER hybrid policy.
+Human context-checked holdout performance measures generalisation against manually checked labels.
+```
+
+### Downstream v0.3 selected model
+
+The selected downstream weak-label model is:
+
+```text
+v0.2 pos_weight5 model
++ v0.3 per-label tuned thresholds
+```
+
+On the strict weak-label test split:
+
+| Candidate | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---|---:|---:|---:|---:|---:|
+| v0.1 fixed | 0.8912 | 0.8946 | 0.8537 | 0.7766 | 0.0260 |
+| v0.1 tuned | **0.9058** | 0.9020 | 0.8711 | 0.7879 | 0.0250 |
+| v0.2 fixed | 0.8800 | 0.8793 | 0.8691 | 0.7374 | 0.0328 |
+| **v0.2 tuned** | 0.9040 | **0.9073** | **0.8814** | **0.7930** | **0.0239** |
+
+Selected v0.3 thresholds:
+
+| Label | Threshold |
+|---|---:|
+| Brene_Brown | 0.60 |
+| Eckhart_Tolle | 0.46 |
+| Eric_Thomas | 0.68 |
+| Gary_Vee | 0.95 |
+| Jay_Shetty | 0.95 |
+| Nick_Vujicic | 0.50 |
+| other_speaker_present | 0.38 |
+| music_present | 0.74 |
+| audience_reaction_present | 0.69 |
+| silence_present | 0.88 |
+
+### Human context-checked holdout
+
+The selected v0.3 model was evaluated on the human context-checked final holdout:
+
+```text
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/corrected_holdout/
+01_raw_final_holdout_GROUND_TRUTH_FINAL_v08_context_checked.csv
+```
+
+Initial parent-level result:
+
+| Aggregation | Rows | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---|---:|---:|---:|---:|---:|---:|
+| mean | 867 | 0.5379 | **0.6816** | 0.6191 | **0.4498** | **0.0752** |
+| max | 867 | **0.5715** | 0.6553 | **0.6742** | 0.2641 | 0.1309 |
+
+This showed that global mean was safer, while global max improved some bursty labels but over-predicted.
+
+### v0.6 confirmed finding
+
+A repeated calibration/evaluation stability analysis was run across 20 random 50/50 parent-level splits. On each seed, the aggregation method for each label was selected on the calibration split from:
+
+```text
+mean
+max
+top2mean
+```
+
+and evaluated on the held-out evaluation split.
+
+| Method | Macro-F1 mean | Micro-F1 mean | Samples-F1 mean | Exact Match mean | Hamming Loss mean |
+|---|---:|---:|---:|---:|---:|
+| mean | 0.5345 | 0.6776 | 0.6138 | 0.4471 | **0.0759** |
+| max | 0.5605 | 0.6519 | 0.6709 | 0.2589 | 0.1328 |
+| top2mean | 0.6108 | 0.7252 | 0.7283 | 0.4233 | 0.0879 |
+| **calibration-selected labelwise** | **0.6377** | **0.7470** | **0.7508** | **0.4520** | 0.0785 |
+
+Stable aggregation pattern:
+
+| Label | Most frequent selected aggregation |
+|---|---|
+| Brene_Brown | mean |
+| Eckhart_Tolle | mean |
+| Eric_Thomas | top2mean |
+| Gary_Vee | mean |
+| Jay_Shetty | top2mean |
+| Nick_Vujicic | top2mean |
+| other_speaker_present | max |
+| music_present | top2mean |
+| audience_reaction_present | top2mean |
+| silence_present | max |
+
+Confirmed conclusion:
+
+```text
+One global parent aggregation rule is suboptimal for multi-label audio classification.
+Calibration-selected label-specific aggregation is stable across repeated splits and improves Macro-F1, Micro-F1, and Samples-F1 over global mean, max, and top2mean aggregation.
+```
+
+This v0.6 finding is now frozen as the confirmed downstream NeuroAccuExit result before any v0.7 threshold-calibration diagnostic.
+
+---
+
+## 16. Updated final reporting decision
+
+| Role | Final result |
+|---|---|
+| Official v0.8 main-model parent-level result | Parent mean, fixed 0.5, Exit 3 |
+| v0.8 aggregation research finding | Label-aware mean/max aggregation |
+| General normal-audio TATA baseline | Original v0.9 model with fixed threshold 0.50 |
+| Low-energy specialist | Human-reviewed masked v0.10 model with recovered-domain thresholds |
+| Final TATA-LAWYER v0.10.1 system | Domain-aware hybrid weak-label generator |
+| Downstream weak-label model | v0.2 pos_weight5 + v0.3 thresholds |
+| Confirmed downstream NeuroAccuExit finding | v0.6 repeated calibration-selected label-wise parent aggregation |
+| Branch for final TATA documentation | `tata_lawyer_v0.10.1` |
+| Branch/workspace for downstream work | `neuroaccuexit_hybrid_weaklabels` |
+
+The v0.10.1 hybrid should be treated as the final TATA-LAWYER weak-label generator. The v0.6 downstream result should be treated as the confirmed NeuroAccuExit aggregation finding. A future v0.7 can test threshold calibration, but v0.6 does not depend on it.
+

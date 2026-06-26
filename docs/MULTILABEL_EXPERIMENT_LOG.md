@@ -483,3 +483,291 @@ Best strict validation Macro-F1: 0.7771
 The v0.10 manifest is the cleanest annotation artifact so far, but fixed-threshold performance on the original strict test set decreased. The model became conservative: several labels had high precision but low recall. This particularly affected `audience_reaction_present`, `Gary_Vee`, and `Eric_Thomas`.
 
 The next experiment should tune one threshold per label on the strict original validation set, then evaluate once on the strict original test set. Original v0.9 should also be evaluated on the same 158 recovered human-reviewed test rows to establish whether v0.10 improves the low-energy domain.
+
+---
+
+## 28. Downstream NeuroAccuExit hybrid weak-label branch
+
+A new downstream branch was created to use the final TATA-LAWYER v0.10.1 domain-aware hybrid system as a weak-label generator for the main NeuroAccuExit model.
+
+Branch/workspace:
+
+```text
+neuroaccuexit_hybrid_weaklabels
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/
+```
+
+The downstream weak-label manifest uses domain-aware routing:
+
+| Audio domain | Weak-label source |
+|---|---|
+| Normal/original audio | Original v0.9 TATA model, fixed threshold 0.50 |
+| Recovered low-energy audio | Human-reviewed masked v0.10 model, recovered-domain thresholds |
+
+The generated manifest contains:
+
+| Split/domain | Rows |
+|---|---:|
+| train, normal/original | 8,744 |
+| train, recovered low-energy | 701 |
+| val, normal/original | 1,883 |
+| val, recovered low-energy | 159 |
+| test, normal/original | 1,961 |
+| test, recovered low-energy | 158 |
+| **Total** | **13,606** |
+
+Interpretation:
+
+```text
+The downstream model is trained to learn the final TATA-LAWYER hybrid weak-label policy.
+Weak-label test performance measures policy distillation, not direct semantic ground-truth accuracy.
+```
+
+---
+
+## 29. Downstream v0.1/v0.2 training
+
+Two downstream NeuroAccuExit models were trained on the hybrid weak-label manifest.
+
+| Version | Loss setting | Purpose |
+|---|---|---|
+| v0.1 | Plain BCE | Conservative baseline |
+| v0.2 | BCE with capped positive weight 5.0 | Improve recall and shallow-exit learning |
+
+Strict weak-label test result at final exit:
+
+| Model | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---|---:|---:|---:|---:|---:|
+| v0.1 plain BCE | **0.8912** | **0.8946** | 0.8537 | **0.7766** | **0.0260** |
+| v0.2 pos_weight5 | 0.8800 | 0.8793 | **0.8691** | 0.7374 | 0.0328 |
+
+Although v0.1 was stronger at the final exit, v0.2 improved shallow-exit behaviour:
+
+| Exit | v0.1 Macro-F1 | v0.2 Macro-F1 |
+|---|---:|---:|
+| Exit 1 | 0.2165 | **0.4013** |
+| Exit 2 | 0.5734 | **0.6949** |
+| Exit 3 | **0.8912** | 0.8800 |
+
+Decision:
+
+```text
+Keep v0.2 as the preferred downstream candidate because NeuroAccuExit requires useful shallow exits, not only the strongest final-exit classifier.
+```
+
+---
+
+## 30. Downstream v0.3 threshold-tuned weak-label model
+
+Per-label threshold tuning was applied on the strict validation split and evaluated on the strict weak-label test split.
+
+| Candidate | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---|---:|---:|---:|---:|---:|
+| v0.1 fixed | 0.8912 | 0.8946 | 0.8537 | 0.7766 | 0.0260 |
+| v0.1 tuned | **0.9058** | 0.9020 | 0.8711 | 0.7879 | 0.0250 |
+| v0.2 fixed | 0.8800 | 0.8793 | 0.8691 | 0.7374 | 0.0328 |
+| **v0.2 tuned** | 0.9040 | **0.9073** | **0.8814** | **0.7930** | **0.0239** |
+
+Selected downstream weak-label model:
+
+```text
+NeuroAccuExit hybrid weak-label v0.3
+= v0.2 pos_weight5 model
++ per-label tuned thresholds
+```
+
+Selected v0.3 thresholds:
+
+| Label | Threshold |
+|---|---:|
+| Brene_Brown | 0.60 |
+| Eckhart_Tolle | 0.46 |
+| Eric_Thomas | 0.68 |
+| Gary_Vee | 0.95 |
+| Jay_Shetty | 0.95 |
+| Nick_Vujicic | 0.50 |
+| other_speaker_present | 0.38 |
+| music_present | 0.74 |
+| audience_reaction_present | 0.69 |
+| silence_present | 0.88 |
+
+Important limitation:
+
+```text
+The v0.3 weak-label test result shows that the downstream model learned the TATA-LAWYER hybrid policy well.
+It does not prove human ground-truth generalisation.
+```
+
+---
+
+## 31. Human context-checked holdout evaluation
+
+The selected v0.3 model was evaluated on the human context-checked final holdout from the v0.8 human-corrected-balanced pipeline.
+
+Holdout source:
+
+```text
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/corrected_holdout/
+01_raw_final_holdout_GROUND_TRUTH_FINAL_v08_context_checked.csv
+```
+
+Evaluation outputs:
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/
+human_context_checked_holdout_v03/evaluation_v02_tuned/
+```
+
+Initial holdout result:
+
+| Level/aggregation | Rows | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---|---:|---:|---:|---:|---:|---:|
+| Segment-level | 4,335 | 0.5522 | 0.6568 | 0.6082 | 0.4076 | 0.0917 |
+| Parent mean | 867 | 0.5379 | **0.6816** | 0.6191 | **0.4498** | **0.0752** |
+| Parent max | 867 | **0.5715** | 0.6553 | **0.6742** | 0.2641 | 0.1309 |
+
+Interpretation:
+
+```text
+Parent mean is safest overall, but parent max recovers transient/bursty labels at the cost of many false positives.
+This confirms that a single global parent aggregation rule is suboptimal.
+```
+
+---
+
+## 32. v0.4/v0.4b label-specific parent aggregation diagnostics
+
+A diagnostic experiment compared parent-level aggregation rules without retraining the model.
+
+| Method | Rows | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss | Avg Pred Labels |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| mean | 867 | 0.5379 | 0.6816 | 0.6191 | 0.4498 | **0.0752** | 0.8927 |
+| max | 867 | 0.5715 | 0.6553 | 0.6742 | 0.2641 | 0.1309 | 2.3287 |
+| top2mean | 867 | 0.6125 | 0.7278 | 0.7310 | 0.4268 | 0.0870 | 1.7255 |
+| **v0.4b labelwise** | 867 | **0.6647** | **0.7527** | **0.7560** | **0.4591** | 0.0762 | 1.6136 |
+
+v0.4b diagnostic aggregation map:
+
+| Label | Aggregation |
+|---|---|
+| Brene_Brown | mean |
+| Eckhart_Tolle | mean |
+| Eric_Thomas | top2mean |
+| Gary_Vee | mean |
+| Jay_Shetty | top2mean |
+| Nick_Vujicic | top2mean |
+| other_speaker_present | max |
+| music_present | top2mean |
+| audience_reaction_present | top2mean |
+| silence_present | max |
+
+Interpretation:
+
+```text
+Label-specific parent aggregation improves human context-checked holdout performance without retraining.
+However, v0.4b is diagnostic because the aggregation map was chosen after observing holdout behaviour.
+```
+
+---
+
+## 33. v0.5 calibration-selected label-wise aggregation
+
+To avoid directly selecting the aggregation map on the full holdout, the 867 parent clips were split into calibration and evaluation halves.
+
+Selection was performed on the calibration split only, then evaluated on the evaluation split.
+
+Selected v0.5 aggregation map:
+
+| Label | Selected aggregation |
+|---|---|
+| Brene_Brown | mean |
+| Eckhart_Tolle | mean |
+| Eric_Thomas | top2mean |
+| Gary_Vee | mean |
+| Jay_Shetty | top2mean |
+| Nick_Vujicic | max |
+| other_speaker_present | max |
+| music_present | top2mean |
+| audience_reaction_present | top2mean |
+| silence_present | max |
+
+Evaluation split result:
+
+| Method | Rows | Macro-F1 | Micro-F1 | Samples-F1 | Exact Match | Hamming Loss |
+|---|---:|---:|---:|---:|---:|---:|
+| mean | 434 | 0.5551 | 0.7084 | 0.6462 | **0.4862** | **0.0687** |
+| max | 434 | 0.5427 | 0.6533 | 0.6793 | 0.2765 | 0.1313 |
+| top2mean | 434 | 0.6129 | 0.7335 | 0.7368 | 0.4447 | 0.0839 |
+| **v0.5 calibration-selected labelwise** | 434 | **0.6355** | **0.7491** | **0.7521** | 0.4447 | 0.0772 |
+
+Interpretation:
+
+```text
+Calibration-selected label-wise aggregation improves Macro-F1, Micro-F1, and Samples-F1 over all global aggregation rules on the evaluation split, while mean remains slightly better for Exact Match and Hamming Loss.
+```
+
+---
+
+## 34. v0.6 repeated calibration/evaluation stability
+
+The calibration/evaluation experiment was repeated across 20 random seeds to test stability.
+
+| Method | Macro-F1 mean | Macro-F1 std | Micro-F1 mean | Micro-F1 std | Samples-F1 mean | Samples-F1 std | Exact Match mean | Hamming Loss mean |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| mean | 0.5345 | 0.0130 | 0.6776 | 0.0073 | 0.6138 | 0.0127 | 0.4471 | **0.0759** |
+| max | 0.5605 | 0.0177 | 0.6519 | 0.0087 | 0.6709 | 0.0106 | 0.2589 | 0.1328 |
+| top2mean | 0.6108 | 0.0096 | 0.7252 | 0.0074 | 0.7283 | 0.0087 | 0.4233 | 0.0879 |
+| **calibration-selected labelwise** | **0.6377** | 0.0140 | **0.7470** | 0.0161 | **0.7508** | 0.0151 | **0.4520** | 0.0785 |
+
+Selection frequency across 20 seeds:
+
+| Label | Most frequent selected aggregation | Count |
+|---|---|---:|
+| Brene_Brown | mean | 20/20 |
+| Eckhart_Tolle | mean | 20/20 |
+| Eric_Thomas | top2mean | 18/20 |
+| Gary_Vee | mean | 17/20 |
+| Jay_Shetty | top2mean | 20/20 |
+| Nick_Vujicic | top2mean | 18/20 |
+| other_speaker_present | max | 20/20 |
+| music_present | top2mean | 20/20 |
+| audience_reaction_present | top2mean | 15/20 |
+| silence_present | max | 16/20 |
+
+Confirmed v0.6 finding:
+
+```text
+Across 20 repeated calibration/evaluation splits, calibration-selected label-specific aggregation consistently outperformed global mean, max, and top2mean aggregation in Macro-F1, Micro-F1, and Samples-F1. It also slightly improved Exact Match over global mean, while Hamming Loss remained only marginally worse than mean.
+```
+
+This finding is now frozen as the confirmed downstream NeuroAccuExit result before any v0.7 threshold-calibration experiment.
+
+---
+
+## 35. Current downstream stopping decision
+
+Stop here for confirmed v0.6 reporting.
+
+Do not retrain the downstream model yet.
+
+The next optional diagnostic is:
+
+```text
+v0.7 = repeated calibration-selected aggregation + per-label threshold calibration
+```
+
+but v0.7 should be treated as a new diagnostic phase, not a prerequisite for freezing v0.6.
+
+Current confirmed result:
+
+```text
+NeuroAccuExit hybrid weak-label downstream model:
+v0.2 pos_weight5 trained model
++ v0.3 per-label thresholds
++ v0.6 repeated calibration-selected label-wise parent aggregation
+
+Confirmed finding:
+one global parent aggregation rule is suboptimal for multi-label audio;
+label-specific aggregation is stable and improves F1-based generalisation.
+```
+

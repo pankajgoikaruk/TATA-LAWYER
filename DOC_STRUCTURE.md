@@ -14,6 +14,7 @@ docs/MULTILABEL_EXPERIMENT_LOG.md
 docs/COMMANDS_V08.md
 docs/COMMANDS_V09.md
 docs/COMMANDS_V010.md
+docs/COMMANDS_V010_01.md
 ```
 
 | File | Purpose |
@@ -25,6 +26,7 @@ docs/COMMANDS_V010.md
 | `COMMANDS_V08.md` | Reproducible v0.8 command history. |
 | `COMMANDS_V09.md` | Reproducible v0.9 workspace, review, recovery, training, and ablation commands. |
 | `COMMANDS_V010.md` | Reproducible v0.10 masked-training and v0.10.1 hybrid-finalisation commands. |
+| `COMMANDS_V010_01.md` | Extended v0.10.1 plus downstream NeuroAccuExit hybrid weak-label v0.1–v0.6 command history. |
 
 ---
 
@@ -435,3 +437,213 @@ tata_v09_human_reviewed_masked_3exit_20260616_114500/threshold_profiles/
 16. The low-energy branch uses recovered-domain thresholds; the normal branch uses the original v0.9 fixed 0.50 threshold.
 17. Do not claim the recovered thresholds are universally optimal; report them as the best selected thresholds for the recovered low-energy validation/test protocol.
 18. Future confirmation should use a new untouched low-energy holdout if a stronger publication claim is needed.
+---
+
+## 8. Downstream NeuroAccuExit hybrid weak-label documentation
+
+### Purpose
+
+This section documents the downstream experiments that use the frozen TATA-LAWYER v0.10.1 domain-aware hybrid as a weak-label generator for a NeuroAccuExit-style three-exit model.
+
+This is a separate phase from TATA-LAWYER itself:
+
+| Phase | Role |
+|---|---|
+| TATA-LAWYER v0.10.1 | Final weak-label/refinement teacher policy |
+| NeuroAccuExit hybrid weak-labels | Downstream student/main-model training and inference-stage aggregation study |
+
+### Recommended reports
+
+```text
+docs/results/human_talk/NEUROACCUEXIT_HYBRID_WEAKLABELS_V06_CONFIRMED_FINDING.md
+```
+
+Optional future report:
+
+```text
+docs/results/human_talk/NEUROACCUEXIT_HYBRID_WEAKLABELS_V07_THRESHOLD_CALIBRATION.md
+```
+
+### Recommended command history
+
+```text
+docs/COMMANDS_V010_01.md
+```
+
+This file now records v0.10.1 finalisation plus the downstream v0.1–v0.6 NeuroAccuExit hybrid weak-label experiments.
+
+### Canonical local workspace
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/
+```
+
+Important subdirectories:
+
+```text
+metadata/
+reports/
+runs/
+human_context_checked_holdout_v03/
+```
+
+### Canonical downstream manifest
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/metadata/final_hybrid_weaklabel_manifest.csv
+```
+
+This manifest contains 13,606 rows:
+
+| Source | Rows |
+|---|---:|
+| Normal/original audio from original v0.9 branch | 12,588 |
+| Recovered low-energy audio from masked v0.10 branch | 1,018 |
+
+### Downstream training runs
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/runs/
+```
+
+Canonical runs:
+
+```text
+neuroaccuexit_hybrid_weaklabels_v01_plain_bce_20260625_194859/
+neuroaccuexit_hybrid_weaklabels_v02_posweight5_20260625_202246/
+```
+
+Selected downstream v0.3 model:
+
+```text
+neuroaccuexit_hybrid_weaklabels_v02_posweight5_20260625_202246/
+threshold_tuning_strict_validation/per_label_thresholds.json
+```
+
+Selected v0.3 thresholds:
+
+| Label | Threshold |
+|---|---:|
+| `Brene_Brown` | 0.60 |
+| `Eckhart_Tolle` | 0.46 |
+| `Eric_Thomas` | 0.68 |
+| `Gary_Vee` | 0.95 |
+| `Jay_Shetty` | 0.95 |
+| `Nick_Vujicic` | 0.50 |
+| `other_speaker_present` | 0.38 |
+| `music_present` | 0.74 |
+| `audience_reaction_present` | 0.69 |
+| `silence_present` | 0.88 |
+
+### Human context-checked holdout workspace
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/human_context_checked_holdout_v03/
+```
+
+Source CSV:
+
+```text
+human_talk_workspace/tata_v0.8_human_corrected_balanced_pipeline/corrected_holdout/
+01_raw_final_holdout_GROUND_TRUTH_FINAL_v08_context_checked.csv
+```
+
+Evaluation directory:
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/human_context_checked_holdout_v03/evaluation_v02_tuned/
+```
+
+Important files:
+
+```text
+holdout_v03_eval_summary.json
+holdout_v03_segment_predictions.csv
+holdout_v03_parent_predictions_mean.csv
+holdout_v03_parent_predictions_max.csv
+holdout_v03_per_label_segment.csv
+holdout_v03_per_label_parent_mean.csv
+holdout_v03_per_label_parent_max.csv
+```
+
+### v0.4/v0.4b label-specific aggregation diagnostic artifacts
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/human_context_checked_holdout_v03/
+evaluation_v02_tuned/v04_label_specific_aggregation_diagnostic/
+```
+
+Important files:
+
+```text
+v04_aggregation_summary.csv
+v04_aggregation_per_label.csv
+v04_labelwise_method.json
+parent_predictions_mean.csv
+parent_predictions_max.csv
+parent_predictions_top2mean.csv
+parent_predictions_labelwise_diagnostic.csv
+```
+
+### v0.5 calibration-selected aggregation artifacts
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/human_context_checked_holdout_v03/
+evaluation_v02_tuned/v05_calibration_selected_labelwise_aggregation/
+```
+
+Important files:
+
+```text
+v05_parent_cal_eval_split.csv
+v05_selected_labelwise_aggregation.csv
+v05_selected_labelwise_aggregation.json
+v05_calibration_eval_summary.csv
+v05_calibration_eval_per_label.csv
+```
+
+### v0.6 repeated stability artifacts
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/human_context_checked_holdout_v03/
+evaluation_v02_tuned/v06_repeated_calibration_eval_stability/
+```
+
+Important files:
+
+```text
+v06_seed_level_eval_results.csv
+v06_repeated_eval_summary.csv
+v06_selected_aggregation_by_seed.csv
+v06_selection_frequency.csv
+```
+
+### v0.6 confirmed finding
+
+| Method | Macro-F1 mean | Micro-F1 mean | Samples-F1 mean | Exact Match mean | Hamming Loss mean |
+|---|---:|---:|---:|---:|---:|
+| mean | 0.5345 | 0.6776 | 0.6138 | 0.4471 | **0.0759** |
+| max | 0.5605 | 0.6519 | 0.6709 | 0.2589 | 0.1328 |
+| top2mean | 0.6108 | 0.7252 | 0.7283 | 0.4233 | 0.0879 |
+| calibration-selected labelwise | **0.6377** | **0.7470** | **0.7508** | **0.4520** | 0.0785 |
+
+### v0.6 result role
+
+| Result | Status | Purpose |
+|---|---|---|
+| v0.3 downstream selected model | Selected student model | Best weak-label strict-test deployment-style model. |
+| Human context-checked holdout evaluation | Generalisation diagnostic | Shows human holdout is harder than weak-label reproduction. |
+| v0.4/v0.4b labelwise aggregation | Diagnostic | Shows label-specific aggregation improves without retraining. |
+| v0.5 calibration-selected labelwise aggregation | Stronger diagnostic | Selects aggregation on calibration half and evaluates on held-out half. |
+| v0.6 repeated stability | Confirmed finding | Shows labelwise aggregation benefit is stable across 20 calibration/evaluation splits. |
+| v0.7 threshold calibration | Optional future diagnostic | Not required before freezing v0.6. |
+
+### Updated preservation rules
+
+19. Treat `human_talk_workspace/neuroaccuexit_hybrid_weaklabels/` as a downstream workspace, not part of the frozen TATA-LAWYER teacher.
+20. Do not overwrite the v0.1/v0.2 run directories or v0.3 tuned thresholds.
+21. Do not modify `holdout_v03_segment_predictions.csv`; all v0.4–v0.6 diagnostics must be derived from it.
+22. Treat v0.4/v0.4b as diagnostic because the mapping was influenced by holdout inspection.
+23. Treat v0.5 and v0.6 as stronger evidence because aggregation choices are selected on calibration splits and evaluated separately.
+24. Freeze v0.6 as the confirmed finding before any optional v0.7 threshold-calibration diagnostic.
+25. When writing the thesis/paper, distinguish weak-label policy learning from human context-checked holdout generalisation.
