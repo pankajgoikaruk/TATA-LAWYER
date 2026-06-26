@@ -744,30 +744,108 @@ This finding is now frozen as the confirmed downstream NeuroAccuExit result befo
 
 ---
 
-## 35. Current downstream stopping decision
+## 35. v0.7 repeated aggregation + threshold calibration
 
-Stop here for confirmed v0.6 reporting.
+After v0.6 was frozen as the confirmed aggregation-only finding, v0.7 tested whether per-label thresholds should also be selected on calibration splits.
 
-Do not retrain the downstream model yet.
-
-The next optional diagnostic is:
+The v0.7 diagnostic used:
 
 ```text
-v0.7 = repeated calibration-selected aggregation + per-label threshold calibration
+20 repeated random 50/50 parent-level splits
+calibration-selected aggregation method per label
+calibration-selected threshold per label
+coarse threshold grid: 0.10, 0.15, ..., 0.95
+held-out evaluation half for reporting
 ```
 
-but v0.7 should be treated as a new diagnostic phase, not a prerequisite for freezing v0.6.
+No model retraining was performed. The experiment reused the saved segment-level prediction file from the human context-checked holdout evaluation.
 
-Current confirmed result:
+Result:
+
+| Method | Macro-F1 mean | Macro-F1 std | Micro-F1 mean | Micro-F1 std | Samples-F1 mean | Samples-F1 std | Exact Match mean | Hamming Loss mean |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| mean fixed thresholds | 0.5345 | 0.0130 | 0.6776 | 0.0073 | 0.6138 | 0.0127 | 0.4471 | 0.0759 |
+| max fixed thresholds | 0.5605 | 0.0177 | 0.6519 | 0.0087 | 0.6709 | 0.0106 | 0.2589 | 0.1328 |
+| top2mean fixed thresholds | 0.6108 | 0.0096 | 0.7252 | 0.0074 | 0.7283 | 0.0087 | 0.4233 | 0.0879 |
+| v0.7 aggregation + threshold calibrated | **0.6637** | 0.0204 | **0.7725** | 0.0095 | **0.7861** | 0.0099 | **0.4809** | **0.0702** |
+
+Comparison with frozen v0.6:
+
+| Metric | v0.6 aggregation only | v0.7 aggregation + threshold calibration | Change |
+|---|---:|---:|---:|
+| Macro-F1 | 0.6377 | **0.6637** | +0.0260 |
+| Micro-F1 | 0.7470 | **0.7725** | +0.0255 |
+| Samples-F1 | 0.7508 | **0.7861** | +0.0353 |
+| Exact Match | 0.4520 | **0.4809** | +0.0289 |
+| Hamming Loss | 0.0785 | **0.0702** | -0.0083 |
+
+Aggregation selection frequency:
+
+| Label | Most frequent aggregation after threshold calibration | Frequency |
+|---|---|---:|
+| `Brene_Brown` | mean | 13/20 |
+| `Eckhart_Tolle` | top2mean | 11/20 |
+| `Eric_Thomas` | mean/top2mean tie | 10/20 each |
+| `Gary_Vee` | mean | 20/20 |
+| `Jay_Shetty` | mean | 17/20 |
+| `Nick_Vujicic` | mean/top2mean tie | 10/20 each |
+| `other_speaker_present` | max | 11/20 |
+| `music_present` | mean | 12/20 |
+| `audience_reaction_present` | top2mean | 15/20 |
+| `silence_present` | max | 19/20 |
+
+Threshold summary:
+
+| Label | Mean threshold | Std | Min | Max | Mean calibration support |
+|---|---:|---:|---:|---:|---:|
+| `Brene_Brown` | 0.7375 | 0.1685 | 0.55 | 0.95 | 37.45 |
+| `Eckhart_Tolle` | 0.6625 | 0.1621 | 0.35 | 0.85 | 42.10 |
+| `Eric_Thomas` | 0.5750 | 0.1594 | 0.30 | 0.80 | 33.85 |
+| `Gary_Vee` | 0.8450 | 0.0536 | 0.75 | 0.95 | 33.35 |
+| `Jay_Shetty` | 0.7350 | 0.0947 | 0.65 | 0.95 | 45.15 |
+| `Nick_Vujicic` | 0.3725 | 0.1118 | 0.20 | 0.70 | 23.85 |
+| `other_speaker_present` | 0.1725 | 0.0343 | 0.10 | 0.20 | 228.60 |
+| `music_present` | 0.6750 | 0.1509 | 0.50 | 0.95 | 171.40 |
+| `audience_reaction_present` | 0.9050 | 0.0776 | 0.65 | 0.95 | 13.15 |
+| `silence_present` | 0.5075 | 0.2944 | 0.10 | 0.95 | 6.65 |
+
+Interpretation:
 
 ```text
-NeuroAccuExit hybrid weak-label downstream model:
-v0.2 pos_weight5 trained model
-+ v0.3 per-label thresholds
-+ v0.6 repeated calibration-selected label-wise parent aggregation
+v0.7 is the best calibrated diagnostic result. It improves all aggregate metrics over the frozen v0.6 aggregation-only result and over the global aggregation baselines.
+```
+
+The result also shows that aggregation and threshold choice interact: labels that used mean/top2mean/max in v0.6 may choose different aggregation rules after threshold calibration is allowed.
+
+---
+
+## 36. Current downstream stopping decision
+
+Stop diagnostic experiments here.
+
+Do not retrain the downstream model for this finding.
+
+Current selected diagnostic result:
+
+```text
+main_model_v0.7:
+v0.2 pos_weight5 checkpoint
++ v0.3 tuned weak-label model
++ v0.7 repeated calibration-selected aggregation
++ v0.7 repeated per-label threshold calibration
+```
 
 Confirmed finding:
-one global parent aggregation rule is suboptimal for multi-label audio;
-label-specific aggregation is stable and improves F1-based generalisation.
+
+```text
+One global parent aggregation rule and one inherited threshold profile are suboptimal for multi-label audio.
+Repeated calibration-selected label-specific aggregation and threshold calibration substantially improve human context-checked holdout performance without retraining.
 ```
 
+Limitations:
+
+```text
+This is a calibrated diagnostic over the human context-checked holdout collection, not an external unbiased test result.
+```
+
+The next phase should be writing the method/results section, not running more diagnostics.

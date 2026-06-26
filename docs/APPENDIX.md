@@ -761,14 +761,101 @@ The v0.6 analysis is the confirmed finding to freeze:
 
 > Across repeated calibration/evaluation splits, calibration-selected label-specific aggregation consistently outperformed global aggregation rules on Macro-F1, Micro-F1 and Samples-F1, while maintaining near-mean exact-match behaviour and only a small Hamming Loss penalty. This supports the claim that one parent-level aggregation rule is suboptimal for multi-label audio, and that label-specific temporal evidence aggregation is an important NeuroAccuExit inference-stage contribution.
 
-### AB.7 Updated final interpretation
+### AB.7 v0.7 repeated aggregation + threshold calibration
 
-The downstream experiments support three separate claims:
+After freezing v0.6 as the confirmed aggregation-only finding, v0.7 tested whether the same repeated calibration/evaluation protocol could also select a per-label decision threshold. This analysis still used the saved human context-checked holdout predictions and did not retrain the model.
+
+For each of 20 random 50/50 parent-level splits:
+
+```text
+1. Use the calibration half to select, for each label:
+   - aggregation method from mean, max, top2mean
+   - threshold from a coarse grid 0.10, 0.15, ..., 0.95
+2. Apply the selected label-specific aggregation and threshold policy to the held-out evaluation half.
+3. Compare against global mean, max and top2mean baselines using the original fixed thresholds.
+```
+
+The repeated v0.7 result was:
+
+| Method | Macro-F1 mean | Macro-F1 std | Micro-F1 mean | Micro-F1 std | Samples-F1 mean | Samples-F1 std | Exact Match mean | Hamming Loss mean |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| mean fixed thresholds | 0.5345 | 0.0130 | 0.6776 | 0.0073 | 0.6138 | 0.0127 | 0.4471 | 0.0759 |
+| max fixed thresholds | 0.5605 | 0.0177 | 0.6519 | 0.0087 | 0.6709 | 0.0106 | 0.2589 | 0.1328 |
+| top2mean fixed thresholds | 0.6108 | 0.0096 | 0.7252 | 0.0074 | 0.7283 | 0.0087 | 0.4233 | 0.0879 |
+| v0.7 aggregation + threshold calibrated | **0.6637** | 0.0204 | **0.7725** | 0.0095 | **0.7861** | 0.0099 | **0.4809** | **0.0702** |
+
+This result improves over the frozen v0.6 finding on every reported aggregate metric:
+
+| Metric | v0.6 aggregation only | v0.7 aggregation + threshold calibration | Change |
+|---|---:|---:|---:|
+| Macro-F1 | 0.6377 | **0.6637** | +0.0260 |
+| Micro-F1 | 0.7470 | **0.7725** | +0.0255 |
+| Samples-F1 | 0.7508 | **0.7861** | +0.0353 |
+| Exact Match | 0.4520 | **0.4809** | +0.0289 |
+| Hamming Loss | 0.0785 | **0.0702** | -0.0083 |
+
+The aggregation choices changed after allowing thresholds to calibrate, confirming that aggregation and threshold selection interact.
+
+| Label | Most frequent aggregation after threshold calibration | Frequency |
+|---|---|---:|
+| `Brene_Brown` | mean | 13/20 |
+| `Eckhart_Tolle` | top2mean | 11/20 |
+| `Eric_Thomas` | mean/top2mean tie | 10/20 each |
+| `Gary_Vee` | mean | 20/20 |
+| `Jay_Shetty` | mean | 17/20 |
+| `Nick_Vujicic` | mean/top2mean tie | 10/20 each |
+| `other_speaker_present` | max | 11/20 |
+| `music_present` | mean | 12/20 |
+| `audience_reaction_present` | top2mean | 15/20 |
+| `silence_present` | max | 19/20 |
+
+The calibrated thresholds also differed substantially from the weak-label validation thresholds used earlier:
+
+| Label | Mean threshold | Std | Min | Max | Mean calibration support |
+|---|---:|---:|---:|---:|---:|
+| `Brene_Brown` | 0.7375 | 0.1685 | 0.55 | 0.95 | 37.45 |
+| `Eckhart_Tolle` | 0.6625 | 0.1621 | 0.35 | 0.85 | 42.10 |
+| `Eric_Thomas` | 0.5750 | 0.1594 | 0.30 | 0.80 | 33.85 |
+| `Gary_Vee` | 0.8450 | 0.0536 | 0.75 | 0.95 | 33.35 |
+| `Jay_Shetty` | 0.7350 | 0.0947 | 0.65 | 0.95 | 45.15 |
+| `Nick_Vujicic` | 0.3725 | 0.1118 | 0.20 | 0.70 | 23.85 |
+| `other_speaker_present` | 0.1725 | 0.0343 | 0.10 | 0.20 | 228.60 |
+| `music_present` | 0.6750 | 0.1509 | 0.50 | 0.95 | 171.40 |
+| `audience_reaction_present` | 0.9050 | 0.0776 | 0.65 | 0.95 | 13.15 |
+| `silence_present` | 0.5075 | 0.2944 | 0.10 | 0.95 | 6.65 |
+
+The most important threshold findings were:
+
+| Label | Interpretation |
+|---|---|
+| `other_speaker_present` | Needed a much lower threshold, suggesting the weak-label threshold was too conservative for the human context-checked holdout. |
+| `audience_reaction_present` | Needed a high threshold, consistent with a bursty label that can create many false positives under aggressive aggregation. |
+| `silence_present` | Remained unstable because calibration support was low; this label should be interpreted cautiously. |
+| `Nick_Vujicic` | Needed a lower threshold, suggesting the v0.3 threshold was too strict for this holdout. |
+
+### AB.8 Updated final interpretation
+
+The downstream experiments now support four separate claims:
 
 | Claim | Evidence |
 |---|---|
 | The TATA-LAWYER v0.10.1 hybrid weak-label policy can train a downstream three-exit NeuroAccuExit model. | v0.3 strict weak-label test reached Micro-F1 = 0.9073 and Exact Match = 0.7930. |
 | Human context-checked holdout generalisation is harder than weak-label policy reproduction. | Parent-mean holdout Micro-F1 = 0.6816 and Exact Match = 0.4498. |
-| Label-specific parent aggregation materially improves holdout F1 metrics without retraining. | v0.6 repeated analysis: labelwise Macro-F1 = 0.6377 vs mean = 0.5345, and Samples-F1 = 0.7508 vs mean = 0.6138. |
+| Label-specific parent aggregation improves holdout F1 metrics without retraining. | v0.6 repeated analysis: labelwise Macro-F1 = 0.6377 vs mean = 0.5345. |
+| Joint label-specific aggregation and threshold calibration gives the strongest diagnostic result. | v0.7 repeated analysis: Macro-F1 = 0.6637, Micro-F1 = 0.7725, Samples-F1 = 0.7861, Exact Match = 0.4809 and Hamming Loss = 0.0702. |
 
-The next optional diagnostic is v0.7, where both aggregation method and threshold are selected on calibration splits before evaluation. However, v0.6 is now strong enough to freeze as a confirmed methodological finding.
+The current best downstream diagnostic is therefore:
+
+```text
+NeuroAccuExit downstream model:
+v0.2 pos_weight5 trained checkpoint
++ v0.3 weak-label threshold tuning
++ v0.7 repeated calibration-selected parent aggregation
++ v0.7 repeated per-label threshold calibration
+```
+
+This should be reported as the **best calibrated diagnostic**, not as an external unbiased final test, because the repeated calibration/evaluation analysis still operates within the same human context-checked holdout collection.
+
+The final methodological conclusion is:
+
+> Multi-label audio classification should not force one global parent-level aggregation rule or one inherited threshold profile across all labels. Label-specific aggregation and per-label threshold calibration substantially improve human context-checked holdout performance without retraining the underlying model.

@@ -668,7 +668,7 @@ This showed that global mean was safer, while global max improved some bursty la
 
 ### v0.6 confirmed finding
 
-A repeated calibration/evaluation stability analysis was run across 20 random 50/50 parent-level splits. On each seed, the aggregation method for each label was selected on the calibration split from:
+A repeated calibration/evaluation stability analysis was first run across 20 random 50/50 parent-level splits. On each seed, the aggregation method for each label was selected on the calibration split from:
 
 ```text
 mean
@@ -683,31 +683,54 @@ and evaluated on the held-out evaluation split.
 | mean | 0.5345 | 0.6776 | 0.6138 | 0.4471 | **0.0759** |
 | max | 0.5605 | 0.6519 | 0.6709 | 0.2589 | 0.1328 |
 | top2mean | 0.6108 | 0.7252 | 0.7283 | 0.4233 | 0.0879 |
-| **calibration-selected labelwise** | **0.6377** | **0.7470** | **0.7508** | **0.4520** | 0.0785 |
+| calibration-selected labelwise | **0.6377** | **0.7470** | **0.7508** | **0.4520** | 0.0785 |
 
-Stable aggregation pattern:
+This v0.6 result was frozen as the confirmed aggregation-only finding.
 
-| Label | Most frequent selected aggregation |
-|---|---|
-| Brene_Brown | mean |
-| Eckhart_Tolle | mean |
-| Eric_Thomas | top2mean |
-| Gary_Vee | mean |
-| Jay_Shetty | top2mean |
-| Nick_Vujicic | top2mean |
-| other_speaker_present | max |
-| music_present | top2mean |
-| audience_reaction_present | top2mean |
-| silence_present | max |
+### v0.7 best calibrated diagnostic
+
+v0.7 extended v0.6 by selecting both the parent aggregation rule and the threshold per label on calibration splits, then evaluating on held-out halves across 20 repeated splits.
+
+| Method | Macro-F1 mean | Macro-F1 std | Micro-F1 mean | Micro-F1 std | Samples-F1 mean | Samples-F1 std | Exact Match mean | Hamming Loss mean |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| mean fixed thresholds | 0.5345 | 0.0130 | 0.6776 | 0.0073 | 0.6138 | 0.0127 | 0.4471 | 0.0759 |
+| max fixed thresholds | 0.5605 | 0.0177 | 0.6519 | 0.0087 | 0.6709 | 0.0106 | 0.2589 | 0.1328 |
+| top2mean fixed thresholds | 0.6108 | 0.0096 | 0.7252 | 0.0074 | 0.7283 | 0.0087 | 0.4233 | 0.0879 |
+| v0.7 aggregation + threshold calibrated | **0.6637** | 0.0204 | **0.7725** | 0.0095 | **0.7861** | 0.0099 | **0.4809** | **0.0702** |
+
+Compared with frozen v0.6, v0.7 improved all aggregate metrics:
+
+| Metric | v0.6 | v0.7 | Change |
+|---|---:|---:|---:|
+| Macro-F1 | 0.6377 | **0.6637** | +0.0260 |
+| Micro-F1 | 0.7470 | **0.7725** | +0.0255 |
+| Samples-F1 | 0.7508 | **0.7861** | +0.0353 |
+| Exact Match | 0.4520 | **0.4809** | +0.0289 |
+| Hamming Loss | 0.0785 | **0.0702** | -0.0083 |
+
+v0.7 selected different aggregation/threshold behaviour by label:
+
+| Label | Most frequent aggregation after threshold calibration | Frequency |
+|---|---|---:|
+| `Brene_Brown` | mean | 13/20 |
+| `Eckhart_Tolle` | top2mean | 11/20 |
+| `Eric_Thomas` | mean/top2mean tie | 10/20 each |
+| `Gary_Vee` | mean | 20/20 |
+| `Jay_Shetty` | mean | 17/20 |
+| `Nick_Vujicic` | mean/top2mean tie | 10/20 each |
+| `other_speaker_present` | max | 11/20 |
+| `music_present` | mean | 12/20 |
+| `audience_reaction_present` | top2mean | 15/20 |
+| `silence_present` | max | 19/20 |
 
 Confirmed conclusion:
 
 ```text
-One global parent aggregation rule is suboptimal for multi-label audio classification.
-Calibration-selected label-specific aggregation is stable across repeated splits and improves Macro-F1, Micro-F1, and Samples-F1 over global mean, max, and top2mean aggregation.
+One global parent aggregation rule and one inherited threshold profile are suboptimal for multi-label audio classification.
+Repeated calibration-selected label-specific aggregation and threshold calibration improves human context-checked holdout performance without retraining.
 ```
 
-This v0.6 finding is now frozen as the confirmed downstream NeuroAccuExit result before any v0.7 threshold-calibration diagnostic.
+The v0.7 result is the current best calibrated diagnostic, but it should not be described as an external unbiased test because it uses repeated calibration/evaluation over the same human context-checked holdout collection.
 
 ---
 
@@ -722,8 +745,8 @@ This v0.6 finding is now frozen as the confirmed downstream NeuroAccuExit result
 | Final TATA-LAWYER v0.10.1 system | Domain-aware hybrid weak-label generator |
 | Downstream weak-label model | v0.2 pos_weight5 + v0.3 thresholds |
 | Confirmed downstream NeuroAccuExit finding | v0.6 repeated calibration-selected label-wise parent aggregation |
+| Best calibrated downstream diagnostic | v0.7 repeated aggregation + threshold calibration |
 | Branch for final TATA documentation | `tata_lawyer_v0.10.1` |
-| Branch/workspace for downstream work | `neuroaccuexit_hybrid_weaklabels` |
+| Branch/workspace for downstream work | `neuroaccuexit_hybrid_weaklabels` / `main_model_v0.6` |
 
-The v0.10.1 hybrid should be treated as the final TATA-LAWYER weak-label generator. The v0.6 downstream result should be treated as the confirmed NeuroAccuExit aggregation finding. A future v0.7 can test threshold calibration, but v0.6 does not depend on it.
-
+The v0.10.1 hybrid should be treated as the final TATA-LAWYER weak-label generator. The v0.7 downstream result should be treated as the best calibrated NeuroAccuExit diagnostic. Stop further diagnostics here and begin writing the method/results section unless a new independent holdout or external dataset is introduced.

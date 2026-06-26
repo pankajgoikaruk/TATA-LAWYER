@@ -635,15 +635,49 @@ v06_selection_frequency.csv
 | Human context-checked holdout evaluation | Generalisation diagnostic | Shows human holdout is harder than weak-label reproduction. |
 | v0.4/v0.4b labelwise aggregation | Diagnostic | Shows label-specific aggregation improves without retraining. |
 | v0.5 calibration-selected labelwise aggregation | Stronger diagnostic | Selects aggregation on calibration half and evaluates on held-out half. |
-| v0.6 repeated stability | Confirmed finding | Shows labelwise aggregation benefit is stable across 20 calibration/evaluation splits. |
-| v0.7 threshold calibration | Optional future diagnostic | Not required before freezing v0.6. |
+| v0.6 repeated stability | Frozen confirmed finding | Shows labelwise aggregation benefit is stable across 20 calibration/evaluation splits. |
+
+### v0.7 repeated aggregation + threshold calibration artifacts
+
+```text
+human_talk_workspace/neuroaccuexit_hybrid_weaklabels/human_context_checked_holdout_v03/
+evaluation_v02_tuned/v07_repeated_aggregation_threshold_calibration/
+```
+
+Important files:
+
+```text
+v07_seed_level_eval_results.csv
+v07_repeated_eval_summary.csv
+v07_selected_aggregation_threshold_by_seed.csv
+v07_selection_frequency.csv
+v07_threshold_summary.csv
+```
+
+### v0.7 best calibrated diagnostic
+
+| Method | Macro-F1 mean | Macro-F1 std | Micro-F1 mean | Micro-F1 std | Samples-F1 mean | Samples-F1 std | Exact Match mean | Hamming Loss mean |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| mean fixed thresholds | 0.5345 | 0.0130 | 0.6776 | 0.0073 | 0.6138 | 0.0127 | 0.4471 | 0.0759 |
+| max fixed thresholds | 0.5605 | 0.0177 | 0.6519 | 0.0087 | 0.6709 | 0.0106 | 0.2589 | 0.1328 |
+| top2mean fixed thresholds | 0.6108 | 0.0096 | 0.7252 | 0.0074 | 0.7283 | 0.0087 | 0.4233 | 0.0879 |
+| v0.7 aggregation + threshold calibrated | **0.6637** | 0.0204 | **0.7725** | 0.0095 | **0.7861** | 0.0099 | **0.4809** | **0.0702** |
+
+### v0.7 result role
+
+| Result | Status | Purpose |
+|---|---|---|
+| v0.6 repeated aggregation-only stability | Frozen baseline finding | Confirms label-specific aggregation is stable. |
+| v0.7 repeated aggregation + threshold calibration | Best calibrated diagnostic | Shows label-specific aggregation plus per-label thresholds improves all aggregate metrics. |
+| Future external validation | Not yet done | Needed before claiming external unbiased generalisation. |
 
 ### Updated preservation rules
 
 19. Treat `human_talk_workspace/neuroaccuexit_hybrid_weaklabels/` as a downstream workspace, not part of the frozen TATA-LAWYER teacher.
 20. Do not overwrite the v0.1/v0.2 run directories or v0.3 tuned thresholds.
-21. Do not modify `holdout_v03_segment_predictions.csv`; all v0.4–v0.6 diagnostics must be derived from it.
+21. Do not modify `holdout_v03_segment_predictions.csv`; all v0.4–v0.7 diagnostics must be derived from it.
 22. Treat v0.4/v0.4b as diagnostic because the mapping was influenced by holdout inspection.
 23. Treat v0.5 and v0.6 as stronger evidence because aggregation choices are selected on calibration splits and evaluated separately.
-24. Freeze v0.6 as the confirmed finding before any optional v0.7 threshold-calibration diagnostic.
-25. When writing the thesis/paper, distinguish weak-label policy learning from human context-checked holdout generalisation.
+24. Treat v0.7 as the best calibrated diagnostic because both aggregation and thresholds are selected on calibration splits and evaluated on held-out halves.
+25. Do not run additional diagnostics before writing the method/results section unless a new independent holdout or external dataset is introduced.
+26. When writing the thesis/paper, distinguish weak-label policy learning from human context-checked holdout generalisation.
